@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WarshipTypeMapper">
+    <resultMap id="WarshipTypeResult" type="com.lvwyh.entity.WarshipType">
+        <id property="id" column="id" />
+        <result property="warshipTypeId" column="warship_type_id" />
+        <result property="warshipTypeName" column="warship_type_name" />
+        <result property="armor" column="armor" />
+        <result property="hp" column="hp" />
+        <result property="mobility" column="mobility" />
+        <result property="concealment" column="concealment" />
+        <result property="actionPriority" column="action_priority" />
+        <result property="weaponTypes" column="weapon_types" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.WarshipType" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO warship_type (warship_type_id, warship_type_name, armor, hp, mobility, concealment, action_priority, weapon_types)
+        VALUES (#{warshipTypeId}, #{warshipTypeName}, #{armor}, #{hp}, #{mobility}, #{concealment}, #{actionPriority}, #{weaponTypes})
+    </insert>
+
+    <select id="selectById" resultMap="WarshipTypeResult">
+        SELECT id, warship_type_id, warship_type_name, armor, hp, mobility, concealment, action_priority, weapon_types
+        FROM warship_type
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByWarshipTypeId" resultMap="WarshipTypeResult">
+        SELECT id, warship_type_id, warship_type_name, armor, hp, mobility, concealment, action_priority, weapon_types
+        FROM warship_type
+        WHERE warship_type_id = #{warshipTypeId}
+    </select>
+
+    <select id="selectAll" resultMap="WarshipTypeResult">
+        SELECT id, warship_type_id, warship_type_name, armor, hp, mobility, concealment, action_priority, weapon_types
+        FROM warship_type
+        ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.WarshipType">
+        UPDATE warship_type
+        SET warship_type_id = #{warshipTypeId},
+            warship_type_name = #{warshipTypeName},
+            armor = #{armor},
+            hp = #{hp},
+            mobility = #{mobility},
+            concealment = #{concealment},
+            action_priority = #{actionPriority},
+            weapon_types = #{weaponTypes}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM warship_type WHERE id = #{id}
+    </delete>
+</mapper>

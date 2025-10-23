@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.PlayerWarshipMapper">
+    <resultMap id="PlayerWarshipResult" type="com.lvwyh.entity.PlayerWarship">
+        <id property="id" column="id" />
+        <result property="playerId" column="player_id" />
+        <result property="warshipId" column="warship_id" />
+        <result property="stateId" column="state_id" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.PlayerWarship" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO player_warship (player_id, warship_id, state_id)
+        VALUES (#{playerId}, #{warshipId}, #{stateId})
+    </insert>
+
+    <select id="selectById" resultMap="PlayerWarshipResult">
+        SELECT id, player_id, warship_id, state_id
+        FROM player_warship
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByPlayerAndWarship" resultMap="PlayerWarshipResult">
+        SELECT id, player_id, warship_id, state_id
+        FROM player_warship
+        WHERE player_id = #{playerId}
+          AND warship_id = #{warshipId}
+    </select>
+
+    <select id="selectByPlayerId" resultMap="PlayerWarshipResult">
+        SELECT id, player_id, warship_id, state_id
+        FROM player_warship
+        WHERE player_id = #{playerId}
+        ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.PlayerWarship">
+        UPDATE player_warship
+        SET player_id = #{playerId},
+            warship_id = #{warshipId},
+            state_id = #{stateId}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM player_warship WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByPlayerAndWarship">
+        DELETE FROM player_warship
+        WHERE player_id = #{playerId}
+          AND warship_id = #{warshipId}
+    </delete>
+</mapper>
