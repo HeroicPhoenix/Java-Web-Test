@@ -1,0 +1,29 @@
+<!-- RoomPlayerMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.RoomPlayerMapper">
+    <insert id="batchInsert">
+        INSERT INTO room_player (room_id, player_id, entry_time)
+        VALUES
+        <foreach collection="list" item="it" separator=",">
+            (#{it.roomId}, #{it.playerId}, #{it.entryTime})
+        </foreach>
+    </insert>
+
+    <select id="selectPlayersInRoom" resultType="map">
+        SELECT p.player_id AS playerId, p.player_name AS playerName, p.create_time AS createTime,
+               rp.entry_time AS entryTime
+        FROM room_player rp
+                 JOIN player p ON p.player_id = rp.player_id
+        WHERE rp.room_id = #{roomId}
+        ORDER BY rp.id DESC
+    </select>
+
+    <delete id="deleteByRoomIdAndPlayerId">
+        DELETE FROM room_player WHERE room_id = #{roomId} AND player_id = #{playerId}
+    </delete>
+
+    <delete id="deleteByPlayerId">
+        DELETE FROM room_player WHERE player_id = #{playerId}
+    </delete>
+</mapper>

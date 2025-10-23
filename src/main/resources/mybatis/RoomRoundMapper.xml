@@ -1,0 +1,9 @@
+<!-- RoomRoundMapper.xml -->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.RoomRoundMapper">
+    <insert id="insert" parameterType="com.lvwyh.entity.RoomRound" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO room_round (room_id, rounds, start_time)
+        VALUES (#{roomId}, #{rounds}, #{startTime})
+    </insert>
+</mapper>
