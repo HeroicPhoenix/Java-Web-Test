@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.PlayerWarshipMapper">
+    <resultMap id="PlayerWarshipResult" type="com.lvwyh.entity.PlayerWarship">
+        <result property="playerId" column="player_id" />
+        <result property="warshipId" column="warship_id" />
+        <result property="stateId" column="state_id" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.PlayerWarship">
+        INSERT INTO player_warship (player_id, warship_id, state_id)
+        VALUES (#{playerId}, #{warshipId}, #{stateId})
+    </insert>
+
+    <select id="select" resultMap="PlayerWarshipResult">
+        SELECT * FROM player_warship WHERE player_id = #{playerId} AND warship_id = #{warshipId}
+    </select>
+
+    <select id="selectByPlayerId" resultMap="PlayerWarshipResult">
+        SELECT * FROM player_warship WHERE player_id = #{playerId}
+    </select>
+
+    <delete id="delete">
+        DELETE FROM player_warship WHERE player_id = #{playerId} AND warship_id = #{warshipId}
+    </delete>
+</mapper>

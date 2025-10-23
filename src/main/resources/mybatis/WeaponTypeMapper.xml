@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WeaponTypeMapper">
+    <resultMap id="WeaponTypeResult" type="com.lvwyh.entity.WeaponType">
+        <id property="id" column="id" />
+        <result property="stateId" column="state_id" />
+        <result property="name" column="name" />
+        <result property="level" column="level" />
+        <result property="parentId" column="parent_id" />
+        <result property="skillPoints" column="skill_points" />
+        <result property="linkNum" column="link_num" />
+        <result property="cdN" column="cd_n" />
+        <result property="cdX" column="cd_x" />
+        <result property="heDamage" column="he_damage" />
+        <result property="apDamage" column="ap_damage" />
+        <result property="sapDamage" column="sap_damage" />
+        <result property="actionRadius" column="action_radius" />
+        <result property="speed" column="speed" />
+        <result property="penetrationLevelStart" column="penetration_level_start" />
+        <result property="penetrationLevelEnd" column="penetration_level_end" />
+        <result property="coreBreakdown" column="core_breakdown" />
+        <result property="halfBreakdown" column="half_breakdown" />
+        <result property="passBreakdown" column="pass_breakdown" />
+        <result property="precision" column="precision" />
+        <result property="ignitionRate" column="ignition_rate" />
+        <result property="leakageRate" column="leakage_rate" />
+        <result property="description" column="description" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.WeaponType" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO weapon_type (
+            state_id, name, level, parent_id, skill_points, link_num, cd_n, cd_x, he_damage, ap_damage,
+            sap_damage, action_radius, speed, penetration_level_start, penetration_level_end, core_breakdown,
+            half_breakdown, pass_breakdown, `precision`, ignition_rate, leakage_rate, description
+        ) VALUES (
+            #{stateId}, #{name}, #{level}, #{parentId}, #{skillPoints}, #{linkNum}, #{cdN}, #{cdX}, #{heDamage}, #{apDamage},
+            #{sapDamage}, #{actionRadius}, #{speed}, #{penetrationLevelStart}, #{penetrationLevelEnd}, #{coreBreakdown},
+            #{halfBreakdown}, #{passBreakdown}, #{precision}, #{ignitionRate}, #{leakageRate}, #{description}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="WeaponTypeResult">
+        SELECT * FROM weapon_type WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="WeaponTypeResult">
+        SELECT * FROM weapon_type ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.WeaponType">
+        UPDATE weapon_type
+        SET state_id = #{stateId},
+            name = #{name},
+            level = #{level},
+            parent_id = #{parentId},
+            skill_points = #{skillPoints},
+            link_num = #{linkNum},
+            cd_n = #{cdN},
+            cd_x = #{cdX},
+            he_damage = #{heDamage},
+            ap_damage = #{apDamage},
+            sap_damage = #{sapDamage},
+            action_radius = #{actionRadius},
+            speed = #{speed},
+            penetration_level_start = #{penetrationLevelStart},
+            penetration_level_end = #{penetrationLevelEnd},
+            core_breakdown = #{coreBreakdown},
+            half_breakdown = #{halfBreakdown},
+            pass_breakdown = #{passBreakdown},
+            `precision` = #{precision},
+            ignition_rate = #{ignitionRate},
+            leakage_rate = #{leakageRate},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM weapon_type WHERE id = #{id}
+    </delete>
+</mapper>

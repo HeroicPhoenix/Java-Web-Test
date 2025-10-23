@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.ExpendableTypeMapper">
+    <resultMap id="ExpendableTypeResult" type="com.lvwyh.entity.ExpendableType">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="level" column="level" />
+        <result property="parentId" column="parent_id" />
+        <result property="description" column="description" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.ExpendableType" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO expendable_type (name, level, parent_id, description)
+        VALUES (#{name}, #{level}, #{parentId}, #{description})
+    </insert>
+
+    <select id="selectById" resultMap="ExpendableTypeResult">
+        SELECT * FROM expendable_type WHERE id = #{id}
+    </select>
+
+    <select id="selectAll" resultMap="ExpendableTypeResult">
+        SELECT * FROM expendable_type ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.ExpendableType">
+        UPDATE expendable_type
+        SET name = #{name},
+            level = #{level},
+            parent_id = #{parentId},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM expendable_type WHERE id = #{id}
+    </delete>
+</mapper>

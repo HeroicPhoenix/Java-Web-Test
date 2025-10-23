@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.ArmorTypeMapper">
+    <resultMap id="ArmorTypeResult" type="com.lvwyh.entity.ArmorType">
+        <id property="level" column="level" />
+        <result property="name" column="name" />
+        <result property="startNum" column="start_num" />
+        <result property="endNum" column="end_num" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.ArmorType">
+        INSERT INTO armor_type (level, name, start_num, end_num)
+        VALUES (#{level}, #{name}, #{startNum}, #{endNum})
+    </insert>
+
+    <select id="selectByLevel" resultMap="ArmorTypeResult">
+        SELECT * FROM armor_type WHERE level = #{level}
+    </select>
+
+    <select id="selectAll" resultMap="ArmorTypeResult">
+        SELECT * FROM armor_type ORDER BY level ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.ArmorType">
+        UPDATE armor_type
+        SET name = #{name},
+            start_num = #{startNum},
+            end_num = #{endNum}
+        WHERE level = #{level}
+    </update>
+
+    <delete id="deleteByLevel">
+        DELETE FROM armor_type WHERE level = #{level}
+    </delete>
+</mapper>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WarshipExpendableMapper">
+    <resultMap id="WarshipExpendableResult" type="com.lvwyh.entity.WarshipExpendable">
+        <result property="warshipId" column="warship_id" />
+        <result property="expendableTypeId" column="expendable_type_id" />
+        <result property="expendableNum" column="expendable_num" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.WarshipExpendable">
+        INSERT INTO warship_expendable (warship_id, expendable_type_id, expendable_num)
+        VALUES (#{warshipId}, #{expendableTypeId}, #{expendableNum})
+    </insert>
+
+    <select id="select" resultMap="WarshipExpendableResult">
+        SELECT * FROM warship_expendable WHERE warship_id = #{warshipId} AND expendable_type_id = #{expendableTypeId}
+    </select>
+
+    <select id="selectByWarshipId" resultMap="WarshipExpendableResult">
+        SELECT * FROM warship_expendable WHERE warship_id = #{warshipId}
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.WarshipExpendable">
+        UPDATE warship_expendable
+        SET expendable_num = #{expendableNum}
+        WHERE warship_id = #{warshipId} AND expendable_type_id = #{expendableTypeId}
+    </update>
+
+    <delete id="delete">
+        DELETE FROM warship_expendable WHERE warship_id = #{warshipId} AND expendable_type_id = #{expendableTypeId}
+    </delete>
+</mapper>

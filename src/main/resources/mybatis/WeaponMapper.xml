@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WeaponMapper">
+    <resultMap id="WeaponResult" type="com.lvwyh.entity.Weapon">
+        <id property="id" column="id" />
+        <result property="roomId" column="room_id" />
+        <result property="weaponId" column="weapon_id" />
+        <result property="rounds" column="rounds" />
+        <result property="posX" column="pos_x" />
+        <result property="posY" column="pos_y" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.Weapon" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO weapon (room_id, weapon_id, rounds, pos_x, pos_y)
+        VALUES (#{roomId}, #{weaponId}, #{rounds}, #{posX}, #{posY})
+    </insert>
+
+    <select id="selectById" resultMap="WeaponResult">
+        SELECT * FROM weapon WHERE id = #{id}
+    </select>
+
+    <select id="selectByRoomAndRounds" resultMap="WeaponResult">
+        SELECT * FROM weapon WHERE room_id = #{roomId}
+        <if test="rounds != null">
+            AND rounds = #{rounds}
+        </if>
+        ORDER BY rounds ASC, id ASC
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM weapon WHERE id = #{id}
+    </delete>
+</mapper>

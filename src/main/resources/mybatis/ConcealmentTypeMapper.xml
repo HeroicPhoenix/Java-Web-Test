@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.ConcealmentTypeMapper">
+    <resultMap id="ConcealmentTypeResult" type="com.lvwyh.entity.ConcealmentType">
+        <id property="level" column="level" />
+        <result property="discoverRadius" column="discover_radius" />
+        <result property="airDiscoverRadius" column="air_discover_radius" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.ConcealmentType">
+        INSERT INTO concealment_type (level, discover_radius, air_discover_radius)
+        VALUES (#{level}, #{discoverRadius}, #{airDiscoverRadius})
+    </insert>
+
+    <select id="selectByLevel" resultMap="ConcealmentTypeResult">
+        SELECT * FROM concealment_type WHERE level = #{level}
+    </select>
+
+    <select id="selectAll" resultMap="ConcealmentTypeResult">
+        SELECT * FROM concealment_type ORDER BY level ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.ConcealmentType">
+        UPDATE concealment_type
+        SET discover_radius = #{discoverRadius},
+            air_discover_radius = #{airDiscoverRadius}
+        WHERE level = #{level}
+    </update>
+
+    <delete id="deleteByLevel">
+        DELETE FROM concealment_type WHERE level = #{level}
+    </delete>
+</mapper>
