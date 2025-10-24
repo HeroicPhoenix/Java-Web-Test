@@ -16,7 +16,7 @@ public class WeaponArchive {
     private Boolean isDualUse;
     private Integer actionRadius;
     private Integer ammunitionSpeed;
-    private String precision;
+    private String precision_factor;
     private BigDecimal ignitionRate;
     private BigDecimal leakageRate;
     private Integer damage;
@@ -82,8 +82,21 @@ public class WeaponArchive {
     public Integer getAmmunitionSpeed() { return ammunitionSpeed; }
     public void setAmmunitionSpeed(Integer ammunitionSpeed) { this.ammunitionSpeed = ammunitionSpeed; }
 
-    public String getPrecision() { return precision; }
-    public void setPrecision(String precision) { this.precision = precision; }
+    public Boolean getDualUse() {
+        return isDualUse;
+    }
+
+    public void setDualUse(Boolean dualUse) {
+        isDualUse = dualUse;
+    }
+
+    public String getPrecision_factor() {
+        return precision_factor;
+    }
+
+    public void setPrecision_factor(String precision_factor) {
+        this.precision_factor = precision_factor;
+    }
 
     public BigDecimal getIgnitionRate() { return ignitionRate; }
     public void setIgnitionRate(BigDecimal ignitionRate) { this.ignitionRate = ignitionRate; }

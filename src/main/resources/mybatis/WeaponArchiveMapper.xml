@@ -15,7 +15,7 @@
         <result property="isDualUse" column="is_dual_use" />
         <result property="actionRadius" column="action_radius" />
         <result property="ammunitionSpeed" column="ammunition_speed" />
-        <result property="precision" column="precision" />
+        <result property="precision_factor" column="precision_factor" />
         <result property="ignitionRate" column="ignition_rate" />
         <result property="leakageRate" column="leakage_rate" />
         <result property="damage" column="damage" />
@@ -57,7 +57,7 @@
         is_dual_use,
         action_radius,
         ammunition_speed,
-        `precision` AS precision,
+        precision_factor,
         ignition_rate,
         leakage_rate,
         damage,
@@ -88,13 +88,13 @@
     <insert id="insert" parameterType="com.lvwyh.entity.WeaponArchive" useGeneratedKeys="true" keyProperty="id">
         INSERT INTO weapon_archive (
             state_type_id, weapon_type_id_1, weapon_type_id_2, weapon_model_id, weapon_model_name, skill_points,
-            cd_n, cd_x, link_num, is_dual_use, action_radius, ammunition_speed, `precision`, ignition_rate, leakage_rate,
+            cd_n, cd_x, link_num, is_dual_use, action_radius, ammunition_speed, precision_factor, ignition_rate, leakage_rate,
             damage, `HE_damage`, `AP_damage`, `SAP_damage`, damage_range, penetration_level_start, penetration_level_end,
             core_breakdown, half_breakdown, pass_breakdown, size, payload, `HP`, move_speed, hangar, recovery_speed_n,
             recovery_speed_x, arrival_time, distance_before_attack, description, weapon_type_id_3, weapon_type_id_4, weapon_type_id_5
         ) VALUES (
             #{stateTypeId}, #{weaponTypeId1}, #{weaponTypeId2}, #{weaponModelId}, #{weaponModelName}, #{skillPoints},
-            #{cdN}, #{cdX}, #{linkNum}, #{isDualUse}, #{actionRadius}, #{ammunitionSpeed}, #{precision}, #{ignitionRate}, #{leakageRate},
+            #{cdN}, #{cdX}, #{linkNum}, #{isDualUse}, #{actionRadius}, #{ammunitionSpeed}, #{precision_factor}, #{ignitionRate}, #{leakageRate},
             #{damage}, #{heDamage}, #{apDamage}, #{sapDamage}, #{damageRange}, #{penetrationLevelStart}, #{penetrationLevelEnd},
             #{coreBreakdown}, #{halfBreakdown}, #{passBreakdown}, #{size}, #{payload}, #{hp}, #{moveSpeed}, #{hangar}, #{recoverySpeedN},
             #{recoverySpeedX}, #{arrivalTime}, #{distanceBeforeAttack}, #{description}, #{weaponTypeId3}, #{weaponTypeId4}, #{weaponTypeId5}
@@ -140,7 +140,7 @@
             is_dual_use = #{isDualUse},
             action_radius = #{actionRadius},
             ammunition_speed = #{ammunitionSpeed},
-            `precision` = #{precision},
+            precision_factor = #{precision_factor},
             ignition_rate = #{ignitionRate},
             leakage_rate = #{leakageRate},
             damage = #{damage},
