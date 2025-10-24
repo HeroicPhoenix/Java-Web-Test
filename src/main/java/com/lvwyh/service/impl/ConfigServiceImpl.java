@@ -104,8 +104,8 @@ public class ConfigServiceImpl implements ConfigService {
                     "weapon_type_name TEXT NOT NULL, " +
                     "level INTEGER NOT NULL, " +
                     "parent_id INTEGER, " +
-                    "description TEXT" +
-                    "display_field TEXT" +
+                    "description TEXT," +
+                    "display_field TEXT," +
                     "display_field_name TEXT"
                     + ")");
             stmt.execute("CREATE TABLE IF NOT EXISTS expendable_type (" +
