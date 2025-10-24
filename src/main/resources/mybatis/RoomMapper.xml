@@ -4,7 +4,7 @@
     <resultMap id="RoomMap" type="com.lvwyh.entity.Room">
         <id property="id" column="id"/>
         <result property="roomId" column="room_id"/>
-        <result property="roomName" column="room_name"/>  <!-- 新增 -->
+        <result property="roomName" column="room_name"/>
         <result property="mapSizeX" column="map_size_x"/>
         <result property="mapSizeY" column="map_size_y"/>
         <result property="rounds" column="rounds"/>
@@ -16,6 +16,18 @@
         VALUES (#{roomId}, #{roomName}, #{mapSizeX}, #{mapSizeY}, #{rounds}, #{isBattle})
     </insert>
 
+    <select id="selectById" resultMap="RoomMap">
+        SELECT id, room_id, room_name, map_size_x, map_size_y, rounds, is_battle
+        FROM room
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByRoomId" resultMap="RoomMap">
+        SELECT id, room_id, room_name, map_size_x, map_size_y, rounds, is_battle
+        FROM room
+        WHERE room_id = #{roomId}
+    </select>
+
     <select id="selectPage" resultMap="RoomMap">
         SELECT id, room_id, room_name, map_size_x, map_size_y, rounds, is_battle
         FROM room
@@ -26,4 +38,23 @@
     <select id="count" resultType="long">
         SELECT COUNT(1) FROM room
     </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.Room">
+        UPDATE room
+        SET room_id = #{roomId},
+            room_name = #{roomName},
+            map_size_x = #{mapSizeX},
+            map_size_y = #{mapSizeY},
+            rounds = #{rounds},
+            is_battle = #{isBattle}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM room WHERE id = #{id}
+    </delete>
+
+    <delete id="deleteByRoomId">
+        DELETE FROM room WHERE room_id = #{roomId}
+    </delete>
 </mapper>

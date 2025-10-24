@@ -208,8 +208,29 @@
 <script>
     /* ===== 工具 & API ===== */
     const $ = sel => document.querySelector(sel);
-    async function j(r){ if(!r.ok){ const t=await r.text().catch(()=>String(r.status)); throw new Error(`HTTP ${r.status}: ${t}`);} return r.json(); }
-    function toast(msg, ms=1600){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toast._tid); toast._tid=setTimeout(()=>t.classList.remove('show'), ms); }
+    async function j(r){
+        if(!r.ok){
+            let msg = `HTTP ${r.status}`;
+            try{
+                const ct = r.headers.get('content-type') || '';
+                if(ct.includes('application/json')){
+                    const data = await r.json();
+                    msg += ': ' + (data.message || data.error || JSON.stringify(data));
+                }else{
+                    msg += ': ' + (await r.text());
+                }
+            }catch(_){}
+            throw new Error(msg);
+        }
+        return r.json();
+    }
+    function toast(msg, ms=1600){
+        const t=$('#toast');
+        t.textContent=msg;
+        t.classList.add('show');
+        clearTimeout(toast._tid);
+        toast._tid=setTimeout(()=>t.classList.remove('show'), ms);
+    }
     function fmtTime(s){ return s ? s.replace('T',' ') : ''; }
 
     const api = {
@@ -276,9 +297,71 @@
         $('#rInfo').textContent = `第 ${rPage} / ${Math.max(1, Math.ceil(rTotal/rSize))} 页，共 ${rTotal} 条`;
     }
 
+    /* ===== 列表加载 ===== */
+    async function loadPlayers(){
+        try{
+            const data = await api.players(pPage, pSize);
+            renderPlayers(data);
+        }catch(err){
+            console.error(err);
+            toast('玩家列表加载失败', 2000);
+            throw err;
+        }
+    }
+
+    async function loadRooms(){
+        try{
+            const data = await api.rooms(rPage, rSize);
+            renderRooms(data);
+
+            const list = data.list || [];
+            if(list.length === 0){
+                selectedRoom = null;
+                showRoomDetail(false);
+                $('#roomMembersTable tbody').innerHTML='';
+                return;
+            }
+
+            if(!selectedRoom || !list.some(r=>r.roomId === selectedRoom.roomId)){
+                selectedRoom = list[0];
+                highlightSelectedRoom();
+                fillRoomDetail(selectedRoom);
+                await loadRoomMembers();
+            }else{
+                highlightSelectedRoom();
+            }
+        }catch(err){
+            console.error(err);
+            toast('房间列表加载失败', 2000);
+            throw err;
+        }
+    }
+
     /* ===== 房间详情面板 ===== */
     function showRoomDetail(show){
         $('#roomDetail').style.display = show ? '' : 'none';
+    }
+    function highlightSelectedRoom(){
+        document.querySelectorAll('#roomTable tbody tr').forEach(tr=>{
+            const data = JSON.parse(tr.dataset.room || '{}');
+            if(selectedRoom && data.roomId === selectedRoom.roomId){
+                tr.classList.add('active');
+            }else{
+                tr.classList.remove('active');
+            }
+        });
+    }
+    function fillRoomDetail(data){
+        if(!data){
+            showRoomDetail(false);
+            return;
+        }
+        $('#selRoomId').textContent = data.roomId || '';
+        $('#selRoomName').textContent = data.roomName || '';
+        $('#selRoomSize').textContent = `${data.mapSizeX} × ${data.mapSizeY}`;
+        $('#selRoomRounds').textContent = data.rounds;
+        $('#selRoomBattle').textContent = data.isBattle ? '是' : '否';
+        showRoomDetail(true);
     }
     async function loadRoomMembers(){
         if(!selectedRoom) return;
@@ -322,17 +405,8 @@
         const tr = e.target.closest('tr'); if(!tr) return;
         const data = JSON.parse(tr.dataset.room || '{}');
         selectedRoom = data;
-        // 高亮
-        document.querySelectorAll('#roomTable tbody tr').forEach(r=>r.classList.remove('active'));
-        tr.classList.add('active');
-        // 填详情头
-        $('#selRoomId').textContent = data.roomId || '';
-        $('#selRoomName').textContent = data.roomName || '';
-        $('#selRoomSize').textContent = `${data.mapSizeX} × ${data.mapSizeY}`;
-        $('#selRoomRounds').textContent = data.rounds;
-        $('#selRoomBattle').textContent = data.isBattle ? '是' : '否';
-        showRoomDetail(true);
-        // 拉成员
+        highlightSelectedRoom();
+        fillRoomDetail(data);
         try{ await loadRoomMembers(); }catch(err){ console.error(err); toast('成员加载失败',2000); }
     });
 
@@ -442,47 +516,5 @@
     async function init(){ await Promise.all([loadPlayers(), loadRooms()]); }
     init();
 </script>
-<div class="toast" id="toast2" style="display:none"></div>
 </body>
 </html>
-<script>
-    // 通用 JSON 处理：失败时也尽量把后端返回的文本/JSON错误提示展示出来
-    async function j(r){
-        if (r.ok) return r.json();
-        let msg = `HTTP ${r.status}`;
-        try {
-            const ct = r.headers.get('content-type') || '';
-            if (ct.includes('application/json')) {
-                const data = await r.json();
-                // 兼容 Spring Validation/异常处理常见格式
-                msg += ': ' + (data.message || data.error || JSON.stringify(data));
-            } else {
-                msg += ': ' + (await r.text());
-            }
-        } catch(_) { /* 忽略解析异常 */ }
-        throw new Error(msg);
-    }
-
-    // … 省略 …
-
-    /** ===== 创建玩家 ===== **/
-    const dlgPlayer = document.getElementById('dlgPlayer');
-    document.getElementById('btnCreatePlayer').onclick = ()=>{
-        document.getElementById('playerName').value='';
-        dlgPlayer.showModal();
-    };
-    dlgPlayer.addEventListener('close', async ()=>{
-        if(dlgPlayer.returnValue === 'ok'){
-            const name = (document.getElementById('playerName').value || '').trim();
-            if(!name){ toast('玩家名称不能为空'); return; }
-            try{
-                await api.createPlayer(name);
-                toast('创建玩家成功');
-                pPage = 1; await loadPlayers();
-            }catch(e){
-                console.error(e);
-                toast('创建玩家失败：' + e.message, 3000); // ← 显示后端具体报错
-            }
-        }
-    });
-</script>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WarshipMapper">
+    <resultMap id="WarshipResult" type="com.lvwyh.entity.Warship">
+        <id property="id" column="id" />
+        <result property="roomId" column="room_id" />
+        <result property="warshipId" column="warship_id" />
+        <result property="rounds" column="rounds" />
+        <result property="armor" column="armor" />
+        <result property="hp" column="hp" />
+        <result property="hpPlus" column="hp_plus" />
+        <result property="mobility" column="mobility" />
+        <result property="concealment" column="concealment" />
+        <result property="rate" column="rate" />
+        <result property="posX" column="pos_x" />
+        <result property="posY" column="pos_y" />
+    </resultMap>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.Warship" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO warship (room_id, warship_id, rounds, armor, `HP`, `HP_plus`, mobility, concealment, rate, pos_x, pos_y)
+        VALUES (#{roomId}, #{warshipId}, #{rounds}, #{armor}, #{hp}, #{hpPlus}, #{mobility}, #{concealment}, #{rate}, #{posX}, #{posY})
+    </insert>
+
+    <select id="selectById" resultMap="WarshipResult">
+        SELECT id, room_id, warship_id, rounds, armor,
+               `HP` AS hp,
+               `HP_plus` AS hp_plus,
+               mobility, concealment, rate, pos_x, pos_y
+        FROM warship
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByRoomAndRounds" resultMap="WarshipResult">
+        SELECT id, room_id, warship_id, rounds, armor,
+               `HP` AS hp,
+               `HP_plus` AS hp_plus,
+               mobility, concealment, rate, pos_x, pos_y
+        FROM warship
+        WHERE room_id = #{roomId}
+        <if test="rounds != null">
+            AND rounds = #{rounds}
+        </if>
+        ORDER BY rounds ASC, id ASC
+    </select>
+
+    <delete id="deleteById">
+        DELETE FROM warship WHERE id = #{id}
+    </delete>
+</mapper>

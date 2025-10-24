@@ -109,6 +109,7 @@ public class RoomServiceImpl implements RoomService {
         for (Room r : list) {
             RoomVO vo = new RoomVO();
             vo.setRoomId(r.getRoomId());
+            vo.setRoomName(r.getRoomName());
             vo.setMapSizeX(r.getMapSizeX());
             vo.setMapSizeY(r.getMapSizeY());
             vo.setRounds(r.getRounds());
