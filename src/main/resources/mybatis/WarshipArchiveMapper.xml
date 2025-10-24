@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WarshipArchiveMapper">
+    <resultMap id="WarshipArchiveResult" type="com.lvwyh.entity.WarshipArchive">
+        <id property="id" column="id" />
+        <result property="roomId" column="room_id" />
+        <result property="warshipId" column="warship_id" />
+        <result property="warshipName" column="warship_name" />
+        <result property="warshipTypeId" column="warship_type_id" />
+        <result property="description" column="description" />
+        <result property="createTime" column="create_time" />
+        <result property="armorBase" column="armor_base" />
+        <result property="armorAdd" column="armor_add" />
+        <result property="hpBase" column="hp_base" />
+        <result property="hpAdd" column="hp_add" />
+        <result property="hpPlusBase" column="hp_plus_base" />
+        <result property="hpPlusAdd" column="hp_plus_add" />
+        <result property="mobilityBase" column="mobility_base" />
+        <result property="mobilityAdd" column="mobility_add" />
+        <result property="concealmentBase" column="concealment_base" />
+        <result property="concealmentAdd" column="concealment_add" />
+        <result property="rate" column="rate" />
+        <result property="totalSkillPoints" column="total_skill_points" />
+        <result property="divingRounds" column="diving_rounds" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,
+        room_id,
+        warship_id,
+        warship_name,
+        warship_type_id,
+        description,
+        create_time,
+        armor_base,
+        armor_add,
+        `HP_base` AS hp_base,
+        `HP_add` AS hp_add,
+        `HP_plus_base` AS hp_plus_base,
+        `HP_plus_add` AS hp_plus_add,
+        mobility_base,
+        mobility_add,
+        concealment_base,
+        concealment_add,
+        rate,
+        total_skill_points,
+        diving_rounds
+    </sql>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.WarshipArchive" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO warship_archive (
+            room_id, warship_id, warship_name, warship_type_id, description, create_time, armor_base, armor_add,
+            `HP_base`, `HP_add`, `HP_plus_base`, `HP_plus_add`, mobility_base, mobility_add,
+            concealment_base, concealment_add, rate, total_skill_points, diving_rounds
+        ) VALUES (
+            #{roomId}, #{warshipId}, #{warshipName}, #{warshipTypeId}, #{description}, #{createTime}, #{armorBase}, #{armorAdd},
+            #{hpBase}, #{hpAdd}, #{hpPlusBase}, #{hpPlusAdd}, #{mobilityBase}, #{mobilityAdd},
+            #{concealmentBase}, #{concealmentAdd}, #{rate}, #{totalSkillPoints}, #{divingRounds}
+        )
+    </insert>
+
+    <select id="selectById" resultMap="WarshipArchiveResult">
+        SELECT <include refid="Base_Column_List" />
+        FROM warship_archive
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByRoom" resultMap="WarshipArchiveResult">
+        SELECT <include refid="Base_Column_List" />
+        FROM warship_archive
+        WHERE room_id = #{roomId}
+        ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.WarshipArchive">
+        UPDATE warship_archive
+        SET warship_name = #{warshipName},
+            warship_type_id = #{warshipTypeId},
+            description = #{description},
+            armor_base = #{armorBase},
+            armor_add = #{armorAdd},
+            `HP_base` = #{hpBase},
+            `HP_add` = #{hpAdd},
+            `HP_plus_base` = #{hpPlusBase},
+            `HP_plus_add` = #{hpPlusAdd},
+            mobility_base = #{mobilityBase},
+            mobility_add = #{mobilityAdd},
+            concealment_base = #{concealmentBase},
+            concealment_add = #{concealmentAdd},
+            rate = #{rate},
+            total_skill_points = #{totalSkillPoints},
+            diving_rounds = #{divingRounds}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM warship_archive WHERE id = #{id}
+    </delete>
+</mapper>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.WeaponTypeMapper">
+    <resultMap id="WeaponTypeResult" type="com.lvwyh.entity.WeaponType">
+        <id property="id" column="id" />
+        <result property="weaponTypeId" column="weapon_type_id" />
+        <result property="weaponTypeName" column="weapon_type_name" />
+        <result property="level" column="level" />
+        <result property="parentId" column="parent_id" />
+        <result property="description" column="description" />
+    </resultMap>
+
+    <sql id="BaseColumns">id, weapon_type_id, weapon_type_name, level, parent_id, description</sql>
+
+    <insert id="insert" parameterType="com.lvwyh.entity.WeaponType" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO weapon_type (weapon_type_id, weapon_type_name, level, parent_id, description)
+        VALUES (#{weaponTypeId}, #{weaponTypeName}, #{level}, #{parentId}, #{description})
+    </insert>
+
+    <select id="selectById" resultMap="WeaponTypeResult">
+        SELECT <include refid="BaseColumns" />
+        FROM weapon_type
+        WHERE id = #{id}
+    </select>
+
+    <select id="selectByWeaponTypeId" resultMap="WeaponTypeResult">
+        SELECT <include refid="BaseColumns" />
+        FROM weapon_type
+        WHERE weapon_type_id = #{weaponTypeId}
+    </select>
+
+    <select id="selectAll" resultMap="WeaponTypeResult">
+        SELECT <include refid="BaseColumns" />
+        FROM weapon_type
+        ORDER BY id ASC
+    </select>
+
+    <update id="update" parameterType="com.lvwyh.entity.WeaponType">
+        UPDATE weapon_type
+        SET weapon_type_id = #{weaponTypeId},
+            weapon_type_name = #{weaponTypeName},
+            level = #{level},
+            parent_id = #{parentId},
+            description = #{description}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM weapon_type WHERE id = #{id}
+    </delete>
+</mapper>

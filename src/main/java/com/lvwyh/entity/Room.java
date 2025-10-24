@@ -3,7 +3,7 @@ package com.lvwyh.entity;
 public class Room {
     private Long id;
     private String roomId;
-    private String roomName;   // ← 新增
+    private String roomName;
     private Integer mapSizeX;
     private Integer mapSizeY;
     private Integer rounds;
@@ -15,7 +15,7 @@ public class Room {
     public String getRoomId() { return roomId; }
     public void setRoomId(String roomId) { this.roomId = roomId; }
 
-    public String getRoomName() { return roomName; }      // ← 新增
+    public String getRoomName() { return roomName; }
     public void setRoomName(String roomName) { this.roomName = roomName; }
 
     public Integer getMapSizeX() { return mapSizeX; }
