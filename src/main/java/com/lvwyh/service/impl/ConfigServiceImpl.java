@@ -104,7 +104,9 @@ public class ConfigServiceImpl implements ConfigService {
                     "weapon_type_name TEXT NOT NULL, " +
                     "level INTEGER NOT NULL, " +
                     "parent_id INTEGER, " +
-                    "description TEXT"
+                    "description TEXT" +
+                    "display_field TEXT" +
+                    "display_field_name TEXT"
                     + ")");
             stmt.execute("CREATE TABLE IF NOT EXISTS expendable_type (" +
                     "id INTEGER PRIMARY KEY, " +
@@ -217,7 +219,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     private void insertWeaponTypes(Connection conn, List<WeaponType> list) throws SQLException {
         if (list == null || list.isEmpty()) return;
-        String sql = "INSERT INTO weapon_type (id, weapon_type_id, weapon_type_name, level, parent_id, description) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO weapon_type (id, weapon_type_id, weapon_type_name, level, parent_id, description, display_field, display_field_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             for (WeaponType item : list) {
                 setLong(ps, 1, item.getId());
@@ -226,6 +228,8 @@ public class ConfigServiceImpl implements ConfigService {
                 setInteger(ps, 4, item.getLevel());
                 setInteger(ps, 5, item.getParentId());
                 setString(ps, 6, item.getDescription());
+                setString(ps, 7, item.getDisplayField());
+                setString(ps, 8, item.getDisplayFieldName());
                 ps.addBatch();
             }
             ps.executeBatch();
@@ -306,7 +310,7 @@ public class ConfigServiceImpl implements ConfigService {
                 "SAP_damage, damage_range, penetration_level_start, penetration_level_end, core_breakdown, half_breakdown, pass_breakdown, " +
                 "size, payload, HP, move_speed, hangar, recovery_speed_N, recovery_speed_X, arrival_time, distance_before_attack, description, " +
                 "weapon_type_id_3, weapon_type_id_4, weapon_type_id_5) " +
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             for (WeaponArchive item : list) {
                 setLong(ps, 1, item.getId());
@@ -322,7 +326,7 @@ public class ConfigServiceImpl implements ConfigService {
                 setBooleanAsInt(ps, 11, item.getIsDualUse());
                 setInteger(ps, 12, item.getActionRadius());
                 setInteger(ps, 13, item.getAmmunitionSpeed());
-                setString(ps, 14, item.getPrecision());
+                setString(ps, 14, item.getPrecisionFactor());
                 setBigDecimal(ps, 15, item.getIgnitionRate());
                 setBigDecimal(ps, 16, item.getLeakageRate());
                 setInteger(ps, 17, item.getDamage());

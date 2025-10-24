@@ -8,6 +8,10 @@ public class WeaponType {
     private Integer parentId;
     private String description;
 
+    private String displayField;
+
+    private String displayFieldName;
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -25,4 +29,20 @@ public class WeaponType {
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+
+    public String getDisplayField() {
+        return displayField;
+    }
+
+    public void setDisplayField(String displayField) {
+        this.displayField = displayField;
+    }
+
+    public String getDisplayFieldName() {
+        return displayFieldName;
+    }
+
+    public void setDisplayFieldName(String displayFieldName) {
+        this.displayFieldName = displayFieldName;
+    }
 }
