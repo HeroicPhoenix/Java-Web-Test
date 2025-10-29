@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.lvwyh</groupId>
-    <artifactId>trpg</artifactId>
+    <artifactId>test</artifactId>
     <version>1.0.0</version>
-    <name>trpg</name>
+    <name>test</name>
 
     <properties>
         <java.version>1.8</java.version>
