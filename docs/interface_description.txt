@@ -1,0 +1,324 @@
+### 1. 营销数据资产目录（POST /api/assets/catalog）
+- 入参：name（资产名称）、domain（所属域）、owner（负责人）、description（描述）。
+- 出参：DataAsset 对象（id、name、domain、owner、storageType 等）。
+- 用法描述：新增营销数据资产，初始化各类优化策略字段。
+- 正常用例：{"name":"客户资产","domain":"营销域","owner":"张三","description":"客户核心数据"}。
+- 异常用例：{"name":"","domain":"营销域","owner":"张三"}（名称为空返回500）。
+
+### 2. 数据资产优化管理-数据存储（POST /api/assets/storage）
+- 入参：assetId（资产ID）、storageType（存储方式）、retentionDays（保留天数）。
+- 出参：DataAsset 对象。
+- 用法描述：为既有资产配置存储类型与保存时长策略。
+- 正常用例：{"assetId":1,"storageType":"HDFS","retentionDays":90}。
+- 异常用例：{"assetId":1,"storageType":"","retentionDays":30}（存储类型为空）。
+
+### 3. 数据资产优化管理-数据备份（POST /api/assets/backup）
+- 入参：assetId、backupFrequency（备份频率）、retentionDays。
+- 出参：DataAsset。
+- 用法描述：配置资产备份策略与保留天数。
+- 正常用例：{"assetId":1,"backupFrequency":"DAILY","retentionDays":30}。
+- 异常用例：{"assetId":1,"backupFrequency":"","retentionDays":30}。
+
+### 4. 数据资产优化管理-数据归档（POST /api/assets/archive）
+- 入参：assetId、archiveAfterDays、archiveLocation。
+- 出参：DataAsset。
+- 用法描述：指定资产归档时长与归档位置。
+- 正常用例：{"assetId":1,"archiveAfterDays":60,"archiveLocation":"对象存储"}。
+- 异常用例：{"assetId":1,"archiveAfterDays":0,"archiveLocation":"库房"}。
+
+### 5. 数据资产优化管理-数据删除（POST /api/assets/deletion）
+- 入参：assetId、deletionStrategy、approvalRequired。
+- 出参：DataAsset。
+- 用法描述：定义资产删除策略以及是否需要审批。
+- 正常用例：{"assetId":1,"deletionStrategy":"逻辑删除","approvalRequired":true}。
+- 异常用例：{"assetId":1,"deletionStrategy":"","approvalRequired":true}。
+
+### 6. 元数据清单展示（GET /api/metadata/catalog）
+- 入参：无。
+- 出参：MetadataRecord 数组。
+- 用法描述：展示系统内全部元数据条目。
+- 正常用例：直接 GET 调用。
+- 异常用例：无入参校验场景。
+
+### 7. 元数据查询（POST /api/metadata/query）
+- 入参：keyword（关键字）、source（可选数据源）。
+- 出参：MetadataRecord 数组。
+- 用法描述：根据关键字模糊匹配结构、属性或关系。
+- 正常用例：{"keyword":"customer","source":"ODS"}。
+- 异常用例：{"keyword":""}。
+
+### 8. 元数据导出（POST /api/metadata/export）
+- 入参：keyword、source。
+- 出参：字符串（CSV 文本）。
+- 用法描述：导出匹配的元数据条目用于离线共享。
+- 正常用例：{"keyword":"usage"}。
+- 异常用例：{"keyword":null}。
+
+### 9. 业务规则验证（POST /api/validations/business-rule）
+- 入参：targetName（目标对象）、rule（规则名称）、payload（可选）。
+- 出参：ValidationRecord。
+- 用法描述：记录业务规则验证结果。
+- 正常用例：{"targetName":"订单清洗","rule":"状态校验"}。
+- 异常用例：{"targetName":"","rule":"状态校验"}。
+
+### 10. 数据规则验证（POST /api/validations/data-rule）
+- 入参同上。
+- 出参：ValidationRecord。
+- 用法描述：记录数据质量规则验证。
+- 正常用例：{"targetName":"客户宽表","rule":"唯一性"}。
+- 异常用例：{"targetName":"客户宽表","rule":""}。
+
+### 11. 建表规范校验（POST /api/validations/table-standard）
+- 入参同上。
+- 用法：校验建表规范。
+- 正常用例：{"targetName":"dwd_customer","rule":"命名规范"}。
+- 异常用例：{"targetName":null,"rule":"命名规范"}。
+
+### 12. 字段类型规范校验（POST /api/validations/field-type）
+- 入参同上。
+- 正常用例：{"targetName":"dwd_customer","rule":"字段类型"}。
+- 异常用例：{"targetName":"dwd_customer"}。
+
+### 13. 血缘规范校验（POST /api/validations/lineage）
+- 正常用例：{"targetName":"指标链路","rule":"血缘完整"}。
+- 异常用例：{"targetName":"","rule":"血缘完整"}。
+
+### 14. 编码规范校验（POST /api/validations/coding）
+- 正常用例：{"targetName":"ETL脚本","rule":"代码审核"}。
+- 异常用例：{"targetName":"ETL脚本","rule":""}。
+
+### 15. 分层规范校验（POST /api/validations/layering）
+- 正常用例：{"targetName":"ODS层","rule":"分层定义"}。
+- 异常用例：{"targetName":"","rule":"分层定义"}。
+
+### 16. 调度规范校验（POST /api/validations/scheduling）
+- 正常用例：{"targetName":"调度任务","rule":"调度窗口"}。
+- 异常用例：{"targetName":"调度任务","rule":null}。
+
+### 17. 集成规范校验（POST /api/validations/integration）
+- 正常用例：{"targetName":"接口服务","rule":"集成规范"}。
+- 异常用例：{"targetName":"","rule":"集成规范"}。
+
+### 18. 表模型命名规范校验（POST /api/validations/table-naming）
+- 正常用例：{"targetName":"dwd_order","rule":"表名规则"}。
+- 异常用例：{"targetName":null,"rule":"表名规则"}。
+
+### 19. 节点命名规范校验（POST /api/validations/node-naming）
+- 正常用例：{"targetName":"job_node","rule":"节点命名"}。
+- 异常用例：{"targetName":"","rule":"节点命名"}。
+
+### 20. 项目空间命名规范（POST /api/validations/project-naming）
+- 正常用例：{"targetName":"marketing-space","rule":"项目空间"}。
+- 异常用例：{"targetName":"marketing-space","rule":""}。
+
+### 21. 自定义命名适配规则（POST /api/validations/naming-adapt）
+- 正常用例：{"targetName":"cust_tbl","rule":"驼峰转下划线"}。
+- 异常用例：{"targetName":"","rule":"驼峰转下划线"}。
+
+### 22. 未来电量电费数据预测（POST /api/energy/forecast）
+- 入参：customerNo、recentConsumption、recentCost、forecastDate（可选）。
+- 出参：EnergyUsageForecast。
+- 用法：根据历史消耗估算未来能耗费用。
+- 正常用例：{"customerNo":"C001","recentConsumption":1200,"recentCost":800}。
+- 异常用例：{"customerNo":"C001","recentConsumption":0,"recentCost":800}。
+
+### 23. 对电价过高用户预警（POST /api/energy/alert）
+- 入参同上。
+- 出参：EnergyUsageForecast（含 highRisk）。
+- 正常用例：{"customerNo":"C001","recentConsumption":1200,"recentCost":800}。
+- 异常用例：{"customerNo":"","recentConsumption":1200,"recentCost":800}。
+
+### 24. 导出相关冗余数据清单（POST /api/redundant/export）
+- 入参：tableName、reason。
+- 出参：RedundantDataRecord。
+- 用法：生成冗余数据记录及唯一哈希。
+- 正常用例：{"tableName":"dwd_customer","reason":"重复字段"}。
+- 异常用例：{"tableName":"","reason":"重复字段"}。
+
+### 25. 记录数据生命周期（POST /api/lifecycle/record）
+- 入参：datasetName、stage、startDate、endDate。
+- 出参：DataLifecycleRecord。
+- 正常用例：{"datasetName":"dws_sales","stage":"生产","startDate":"2024-05-01"}。
+- 异常用例：{"datasetName":"","stage":"生产"}。
+
+### 26. 数据存储周期规划-时效性较强（POST /api/lifecycle/plan/short）
+- 入参同上。
+- 出参：DataLifecycleRecord（endDate 自动+30天）。
+- 正常用例：{"datasetName":"临时指标","stage":"短期"}。
+- 异常用例：{"datasetName":null,"stage":"短期"}。
+
+### 27. 数据存储周期规划-长期业务数据（POST /api/lifecycle/plan/long）
+- 入参同上。
+- 出参：DataLifecycleRecord。
+- 正常用例：{"datasetName":"年度指标","stage":"长期"}。
+- 异常用例：{"datasetName":"","stage":"长期"}。
+
+### 28. 分类管理查询语句（POST /api/slow-sql/categorize）
+- 入参：statement（SQL）、suggestion（优化建议）。
+- 出参：SlowSqlRecord。
+- 正常用例：{"statement":"select * from big_table","suggestion":"添加索引"}。
+- 异常用例：{"statement":"","suggestion":"添加索引"}。
+
+### 29. 数据库结构调整策略（POST /api/slow-sql/structure）
+- 入参同上。
+- 正常用例：{"statement":"alter table add column","suggestion":"拆分分区"}。
+- 异常用例：{"statement":"alter table","suggestion":""}。
+
+### 30. 建立数据库监控记录（POST /api/slow-sql/monitoring）
+- 入参同上。
+- 正常用例：{"statement":"select count(*)","suggestion":"配置慢SQL监控"}。
+- 异常用例：{"statement":null,"suggestion":"配置慢SQL监控"}。
+
+### 31. 数据权威源目录清单（POST /api/authority/catalog）
+- 入参：datasetName、authorityName、description、contact。
+- 出参：DataAuthorityRecord。
+- 正常用例：{"datasetName":"营销主题","authorityName":"主数据组","description":"权威数据源"}。
+- 异常用例：{"datasetName":"","authorityName":"主数据组"}。
+
+### 32. 营销指标的数据来源追溯（POST /api/authority/trace）
+- 入参：datasetName、authorityName 等。
+- 出参：DataAuthorityRecord 列表。
+- 正常用例：{"datasetName":"指标001","authorityName":"数据治理"}。
+- 异常用例：{"datasetName":"","authorityName":"数据治理"}。
+
+### 33. 权限管理—管理员授权（POST /api/permissions/admin）
+- 入参：role、resource、permission。
+- 出参：PermissionRecord。
+- 正常用例：{"role":"ADMIN","resource":"资产清单","permission":"编辑"}。
+- 异常用例：{"role":"USER","resource":"资产清单","permission":"编辑"}（非管理员）。
+
+### 34. 权限管理—普通用户授权（POST /api/permissions/user）
+- 入参同上。
+- 出参：PermissionRecord 列表。
+- 正常用例：{"role":"USER","resource":"血缘","permission":"只读"}。
+- 异常用例：{"role":"","resource":"血缘","permission":"只读"}。
+
+### 35. 数据加密（POST /api/security/encrypt）
+- 入参：target、strategy（可选）。
+- 出参：SecurityRule。
+- 正常用例：{"target":"customer_phone","strategy":"AES256"}。
+- 异常用例：{"target":"","strategy":"AES256"}。
+
+### 36. 权限控制（POST /api/security/permission）
+- 入参同上。
+- 正常用例：{"target":"report_api","strategy":"ROLE_BASED"}。
+- 异常用例：{"target":null,"strategy":"ROLE_BASED"}。
+
+### 37. 数据脱敏（POST /api/security/mask）
+- 入参：target、strategy。
+- 正常用例：{"target":"id_card","strategy":"部分掩码"}。
+- 异常用例：{"target":"","strategy":"部分掩码"}。
+
+### 38. 查询分析指定历史时点的营销业务指标（POST /api/metrics/history）
+- 入参：metricCode、referenceDate、value、dimension。
+- 出参：MetricRecord。
+- 正常用例：{"metricCode":"GMV","referenceDate":"2024-05-01","value":12345}。
+- 异常用例：{"metricCode":"","referenceDate":"2024-05-01"}。
+
+### 39. 业务指标趋势变化分析-日（POST /api/metrics/trend/day）
+- 入参同上。
+- 出参：MetricRecord 列表。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":null}。
+
+### 40. 业务指标趋势变化分析-周（POST /api/metrics/trend/week）
+- 入参同上。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":""}。
+
+### 41. 业务指标趋势变化分析-月（POST /api/metrics/trend/month）
+- 入参同上。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":null}。
+
+### 42. 业务指标与历史数据的对比-同比（POST /api/metrics/compare/yoy）
+- 入参同上。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":""}。
+
+### 43. 业务指标与历史数据的对比-环比（POST /api/metrics/compare/mom）
+- 入参同上。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":null}。
+
+### 44. 营销业务指标实时监控分析-指标分类维度（POST /api/metrics/monitoring）
+- 入参同上。
+- 正常用例：{"metricCode":"GMV"}。
+- 异常用例：{"metricCode":""}。
+
+### 45. 营销标签应用情况监控分析-标签应用数量（POST /api/tags/count）
+- 入参：tagCode、value（可选）。
+- 出参：TagUsageRecord。
+- 正常用例：{"tagCode":"TAG_A","value":120}。
+- 异常用例：{"tagCode":"","value":120}。
+
+### 46. 营销标签应用情况监控分析-标签应用使用频率（POST /api/tags/frequency）
+- 入参同上。
+- 出参：TagUsageRecord 列表。
+- 正常用例：{"tagCode":"TAG_A"}。
+- 异常用例：{"tagCode":null}。
+
+### 47. 营销标签应用情况监控分析-标签应用影响范围（POST /api/tags/influence）
+- 入参同上。
+- 正常用例：{"tagCode":"TAG_A"}。
+- 异常用例：{"tagCode":""}。
+
+### 48. 实时监控标签应用情况和效果-标签应用触发情况（POST /api/tags/trigger）
+- 入参同上。
+- 正常用例：{"tagCode":"TAG_A","value":10}。
+- 异常用例：{"tagCode":null,"value":10}。
+
+### 49. 实时监控标签应用情况和效果-标签应用应用效果（POST /api/tags/effect）
+- 入参同上。
+- 正常用例：{"tagCode":"TAG_A","value":0.3}。
+- 异常用例：{"tagCode":"","value":0.3}。
+
+### 50. 实时监控标签应用情况和效果-标签应用用户反馈（POST /api/tags/feedback）
+- 入参同上。
+- 正常用例：{"tagCode":"TAG_A","value":4.8}。
+- 异常用例：{"tagCode":null,"value":4.8}。
+
+### 51. 配置脱敏加密规则（POST /api/keys/masking）
+- 入参：keyName、algorithm。
+- 出参：KeyManagementRecord。
+- 正常用例：{"keyName":"mask_rule","algorithm":"MASK"}。
+- 异常用例：{"keyName":"","algorithm":"MASK"}。
+
+### 52. 密钥生成（POST /api/keys/generate）
+- 入参：keyName、algorithm。
+- 正常用例：{"keyName":"enc_key","algorithm":"AES256"}。
+- 异常用例：{"keyName":null,"algorithm":"AES256"}。
+
+### 53. 密钥存储（POST /api/keys/store）
+- 入参同上。
+- 正常用例：{"keyName":"enc_key","algorithm":"AES256"}。
+- 异常用例：{"keyName":"","algorithm":"AES256"}。
+
+### 54. 密钥分发（POST /api/keys/distribute）
+- 入参同上。
+- 正常用例：{"keyName":"enc_key","algorithm":"AES256"}。
+- 异常用例：{"keyName":null,"algorithm":"AES256"}。
+
+### 55. 密钥轮换（POST /api/keys/rotate）
+- 入参：keyName、algorithm。
+- 出参：KeyManagementRecord 列表。
+- 正常用例：{"keyName":"enc_key","algorithm":"AES256"}。
+- 异常用例：{"keyName":""}。
+
+### 56. 添加校验规则到规则库（POST /api/rules）
+- 入参：ruleName、expression、description。
+- 出参：QualityRule。
+- 正常用例：{"ruleName":"非空校验","expression":"column is not null"}。
+- 异常用例：{"ruleName":"","expression":"column is not null"}。
+
+### 57. 查询校验规则（GET /api/rules）
+- 入参：无。
+- 出参：QualityRule 列表。
+- 正常用例：直接 GET 调用。
+- 异常用例：无。
+
+### 58. 删除校验规则（POST /api/rules/delete）
+- 入参：id。
+- 出参：字符串 "deleted"。
+- 正常用例：{"id":1}。
+- 异常用例：{"id":0}。
