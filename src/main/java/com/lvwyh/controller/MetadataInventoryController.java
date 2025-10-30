@@ -6,6 +6,10 @@ import com.lvwyh.ao.MetadataQueryAO;
 import com.lvwyh.service.MetadataInventoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +24,8 @@ import java.util.Map;
 @Tag(name = "元数据清单", description = "元数据清单展示、查询、导出接口")
 public class MetadataInventoryController {
 
-    private final MetadataInventoryService metadataInventoryService;
-
-    public MetadataInventoryController(MetadataInventoryService metadataInventoryService) {
-        this.metadataInventoryService = metadataInventoryService;
-    }
+    @Autowired
+    private MetadataInventoryService metadataInventoryService;
 
     @PostMapping("/list")
     @Operation(summary = "元数据清单展示")
