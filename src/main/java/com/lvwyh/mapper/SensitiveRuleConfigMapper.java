@@ -5,10 +5,12 @@ import com.lvwyh.entity.KeyDistributionRecord;
 import com.lvwyh.entity.KeyRotationRecord;
 import com.lvwyh.entity.KeyStorageRecord;
 import com.lvwyh.entity.MaskingRuleConfig;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface SensitiveRuleConfigMapper {
     int insertMaskingRule(MaskingRuleConfig record);
 
