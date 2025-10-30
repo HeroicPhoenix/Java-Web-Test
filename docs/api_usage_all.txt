@@ -1,0 +1,279 @@
+## 1. 导出相关冗余数据清单 `/api/data-redundancy/export`
+- **入参**：`domainName`(必填, 要导出的业务领域)、`outputFormat`(必填, 仅支持 CSV 或 JSON)、`includeResolved`(可选, 是否包含已整改记录)
+- **出参**：`success`(布尔标记请求是否成功)、`total`(满足条件的冗余条目数量)、`exportFormat`(导出格式)、`records`(冗余记录列表)
+- **用法描述**：根据领域名称导出冗余数据记录，可选择导出格式和是否包含已整改项。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-redundancy/export -H "Content-Type: application/json" -d '{"domainName":"营销活动","outputFormat":"CSV","includeResolved":true}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-redundancy/export -H "Content-Type: application/json" -d '{"domainName":"营销活动","outputFormat":"CSV","includeResolved":true}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-redundancy/export -H "Content-Type: application/json" -d '{"domainName":"","outputFormat":"TXT"}'
+
+## 2. 记录数据生命周期 `/api/data-storage-cycle/lifecycle`
+- **入参**：`datasetName`(必填, 数据集名称)、`businessProcess`(可选, 所属业务流程)、`retentionDays`(必填, 保留天数>0)、`owner`(必填, 负责人账号)
+- **出参**：`success`(布尔状态)、`records`(该数据集的生命周期记录列表)
+- **用法描述**：记录业务数据集的生命周期设定并返回当前记录列表。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/lifecycle -H "Content-Type: application/json" -d '{"datasetName":"customer_order","businessProcess":"订单履约","retentionDays":60,"owner":"li.si"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-storage-cycle/lifecycle -H "Content-Type: application/json" -d '{"datasetName":"customer_order","businessProcess":"订单履约","retentionDays":60,"owner":"li.si"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/lifecycle -H "Content-Type: application/json" -d '{"datasetName":"customer_order","retentionDays":0,"owner":""}'
+
+## 3. 数据存储周期规划-时效性较强的数据，适当缩短存储周期 `/api/data-storage-cycle/plan/high-sensitivity`
+- **入参**：`datasetName`(必填, 数据集名称)、`recommendedDays`(必填, 1-90 天的建议期限)、`justification`(必填, 缩短理由不少于5个字符)、`requestedBy`(必填, 申请人)
+- **出参**：`success`(布尔状态)、`plans`(高敏数据的缩短策略列表)
+- **用法描述**：为高时效数据制定短周期存储计划。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/high-sensitivity -H "Content-Type: application/json" -d '{"datasetName":"real_time_event","recommendedDays":14,"justification":"实时事件仅需保留两周","requestedBy":"wang.wu"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-storage-cycle/plan/high-sensitivity -H "Content-Type: application/json" -d '{"datasetName":"real_time_event","recommendedDays":14,"justification":"实时事件仅需保留两周","requestedBy":"wang.wu"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/high-sensitivity -H "Content-Type: application/json" -d '{"datasetName":"real_time_event","recommendedDays":120,"justification":"短期","requestedBy":""}'
+
+## 4. 数据存储周期规划-长期业务数据，考虑长期存储策略 `/api/data-storage-cycle/plan/long-term`
+- **入参**：`datasetName`(必填, 数据集名称)、`minimumRetentionDays`(必填, 不少于180天)、`archivalStrategy`(必填, 至少10个字符的长期策略描述)、`reviewer`(必填, 审核人)
+- **出参**：`success`(布尔状态)、`plans`(长期存储策略列表)
+- **用法描述**：提交长期业务数据的存储与归档策略。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/long-term -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","minimumRetentionDays":730,"archivalStrategy":"每年归档一次并同步冷存储","reviewer":"admin"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-storage-cycle/plan/long-term -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","minimumRetentionDays":730,"archivalStrategy":"每年归档一次并同步冷存储","reviewer":"admin"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/long-term -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","minimumRetentionDays":30,"archivalStrategy":"短策略","reviewer":""}'
+
+## 5. 分类管理查询语句 `/api/slow-sql/classify`
+- **入参**：`categoryName`(必填, 慢SQL分类名称)、`sampleSql`(必填, 示例SQL不少于10个字符)、`optimizationSuggestion`(可选, 调优建议)、`expectedGain`(必填, 0-100之间的收益预估)
+- **出参**：`success`(布尔状态)、`queries`(分类后的慢SQL样例列表)
+- **用法描述**：登记慢SQL分类与优化建议，供运维查询。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/slow-sql/classify -H "Content-Type: application/json" -d '{"categoryName":"缺索引查询","sampleSql":"SELECT * FROM orders WHERE customer_id = ?","optimizationSuggestion":"增加customer_id索引","expectedGain":60}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/slow-sql/classify -H "Content-Type: application/json" -d '{"categoryName":"缺索引查询","sampleSql":"SELECT * FROM orders WHERE customer_id = ?","optimizationSuggestion":"增加customer_id索引","expectedGain":60}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/slow-sql/classify -H "Content-Type: application/json" -d '{"categoryName":"","sampleSql":"select 1","expectedGain":200}'
+
+## 6. 数据库结构调整策略 `/api/slow-sql/structure`
+- **入参**：`strategyName`(必填, 调整策略名称)、`adjustmentDetail`(必填, 详细策略不少于10个字符)、`expectedImpact`(必填, 预期影响说明)、`proposer`(可选, 提出人)
+- **出参**：`success`(布尔状态)、`strategies`(结构调整策略清单)
+- **用法描述**：登记数据库结构调整建议，持续完善优化规则库。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/slow-sql/structure -H "Content-Type: application/json" -d '{"strategyName":"订单表分区","adjustmentDetail":"按照月份新增HASH分区，提升写入效率","expectedImpact":"减少写入锁等待","proposer":"ops"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/slow-sql/structure -H "Content-Type: application/json" -d '{"strategyName":"订单表分区","adjustmentDetail":"按照月份新增HASH分区，提升写入效率","expectedImpact":"减少写入锁等待","proposer":"ops"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/slow-sql/structure -H "Content-Type: application/json" -d '{"strategyName":"","adjustmentDetail":"简单调优","expectedImpact":""}'
+
+## 7. 建立数据库监控记录 `/api/slow-sql/monitoring`
+- **入参**：`monitorDate`(必填, yyyy-MM-dd 格式的监控日期)、`slowQueryCount`(必填, 慢查询数量≥0)、`maxResponseTime`(必填, 最大响应时间>0, 单位毫秒)、`notes`(可选, 备注)
+- **出参**：`success`(布尔状态)、`records`(近期待监控记录列表)
+- **用法描述**：记录每日慢SQL监控摘要，便于排查。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/slow-sql/monitoring -H "Content-Type: application/json" -d '{"monitorDate":"2024-05-01","slowQueryCount":23,"maxResponseTime":4500,"notes":"凌晨批处理波动"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/slow-sql/monitoring -H "Content-Type: application/json" -d '{"monitorDate":"2024-05-01","slowQueryCount":23,"maxResponseTime":4500,"notes":"凌晨批处理波动"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/slow-sql/monitoring -H "Content-Type: application/json" -d '{"monitorDate":"","slowQueryCount":-1,"maxResponseTime":0}'
+
+## 8. 数据权威源目录清单 `/api/data-source-management/authority-catalog`
+- **入参**：`domainName`(必填, 数据域名称)、`owner`(可选, 权威源负责人)、`pageNo`(必填, 页码>0)、`pageSize`(必填, 1-200 范围内的分页大小)
+- **出参**：`success`(布尔状态)、`total`(目录条目总数)、`entries`(权威源条目列表)
+- **用法描述**：分页查询指定领域的数据权威源及负责人。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-source-management/authority-catalog -H "Content-Type: application/json" -d '{"domainName":"营销域","owner":"marketing_team","pageNo":1,"pageSize":20}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-source-management/authority-catalog -H "Content-Type: application/json" -d '{"domainName":"营销域","owner":"marketing_team","pageNo":1,"pageSize":20}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-source-management/authority-catalog -H "Content-Type: application/json" -d '{"domainName":"营销域","pageNo":0,"pageSize":300}'
+
+## 9. 营销指标的数据来源追溯 `/api/data-source-management/indicator-trace`
+- **入参**：`indicatorCode`(可选, 指标编码)、`indicatorName`(可选, 指标名称)、`traceDepth`(可选, 血缘追溯深度说明)
+- **出参**：`success`(布尔状态)、`lineage`(指标血缘节点列表)
+- **用法描述**：检索营销指标的来源表字段及血缘路径。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-source-management/indicator-trace -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","traceDepth":"DEEP"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-source-management/indicator-trace -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","traceDepth":"DEEP"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-source-management/indicator-trace -H "Content-Type: application/json" -d '{"indicatorCode":"","indicatorName":""}'
+
+## 10. 权限管理—授权的管理员用户才能进行数据资产清单维护、数据血缘关系等功能管理和修改操作 `/api/data-responsibility/admin-permission`
+- **入参**：`adminUserId`(必填, 管理员用户ID>0)、`permissionType`(必填, 授权的权限类型)、`grantedBy`(必填, 授权人)、`expireAt`(可选, 授权失效时间yyyy-MM-dd HH:mm:ss)
+- **出参**：`success`(布尔状态)、`permissions`(最新管理员授权记录列表)
+- **用法描述**：记录管理员的权限授权信息。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-responsibility/admin-permission -H "Content-Type: application/json" -d '{"adminUserId":1001,"permissionType":"ASSET_MAINTAIN","grantedBy":"system","expireAt":"2025-12-31 23:59:59"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-responsibility/admin-permission -H "Content-Type: application/json" -d '{"adminUserId":1001,"permissionType":"ASSET_MAINTAIN","grantedBy":"system","expireAt":"2025-12-31 23:59:59"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-responsibility/admin-permission -H "Content-Type: application/json" -d '{"adminUserId":0,"permissionType":"","grantedBy":""}'
+
+## 11. 权限管理—普通用户其他可以根据业务对应关系授权是否可查、引用数据血缘相关内容 `/api/data-responsibility/user-access`
+- **入参**：`userId`(必填, 普通用户ID>0)、`businessRelation`(必填, 授权所依据的业务关系)、`accessScope`(必填, 可访问的数据范围)、`approver`(必填, 审批人)
+- **出参**：`success`(布尔状态)、`accesses`(该业务关系下的授权记录列表)
+- **用法描述**：登记普通用户对血缘内容的授权范围。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-responsibility/user-access -H "Content-Type: application/json" -d '{"userId":2008,"businessRelation":"渠道运营","accessScope":"READ_ONLY","approver":"admin"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-responsibility/user-access -H "Content-Type: application/json" -d '{"userId":2008,"businessRelation":"渠道运营","accessScope":"READ_ONLY","approver":"admin"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-responsibility/user-access -H "Content-Type: application/json" -d '{"userId":0,"businessRelation":"","accessScope":"","approver":""}'
+
+## 12. 数据加密 `/api/data-security/encryption`
+- **入参**：`datasetName`(必填, 需加密的数据集)、`algorithm`(必填, 加密算法标识不少于3个字符)、`keyIdentifier`(必填, 密钥标识不少于4个字符)、`enabled`(必填, 是否启用)
+- **出参**：`success`(布尔状态)、`policy`(新增或更新的加密策略详情)
+- **用法描述**：配置或更新数据集的加密策略。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-security/encryption -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","algorithm":"AES256","keyIdentifier":"kms-key-01","enabled":true}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-security/encryption -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","algorithm":"AES256","keyIdentifier":"kms-key-01","enabled":true}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-security/encryption -H "Content-Type: application/json" -d '{"datasetName":"","algorithm":"A","keyIdentifier":"k1"}'
+
+## 13. 权限控制 `/api/data-security/permission`
+- **入参**：`roleName`(必填, 角色名称)、`resourceName`(必填, 数据资源名称)、`accessLevel`(必填, 权限级别描述)、`approvedBy`(必填, 审批人)
+- **出参**：`success`(布尔状态)、`policies`(最新的权限策略列表)
+- **用法描述**：为角色配置数据集访问级别。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-security/permission -H "Content-Type: application/json" -d '{"roleName":"marketing-analyst","datasetName":"campaign_fact","accessLevel":"READ","reviewer":"security_lead"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-security/permission -H "Content-Type: application/json" -d '{"roleName":"marketing-analyst","datasetName":"campaign_fact","accessLevel":"READ","reviewer":"security_lead"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-security/permission -H "Content-Type: application/json" -d '{"roleName":"","datasetName":"","accessLevel":"","reviewer":""}'
+
+## 14. 数据脱敏 `/api/data-security/masking`
+- **入参**：`datasetName`(必填, 脱敏目标数据集)、`fieldName`(必填, 脱敏字段)、`maskingType`(必填, 脱敏方式)、`previewValue`(可选, 脱敏示例)
+- **出参**：`success`(布尔状态)、`rules`(该数据集的脱敏规则列表)
+- **用法描述**：登记或更新字段脱敏策略。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/data-security/masking -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","fieldName":"mobile","maskingRule":"MASK_MIDDLE","sample":"138****5678"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/data-security/masking -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","fieldName":"mobile","maskingRule":"MASK_MIDDLE","sample":"138****5678"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/data-security/masking -H "Content-Type: application/json" -d '{"datasetName":"","fieldName":"","maskingRule":"**"}'
+
+## 15. 查询分析指定历史时点的营销业务指标 `/api/indicator-monitoring/history`
+- **入参**：`indicatorCode`(必填, 指标编码)、`startDate`(必填, 查询起始日期yyyy-MM-dd)、`endDate`(必填, 查询结束日期yyyy-MM-dd)
+- **出参**：`success`(布尔状态)、`snapshots`(历史指标快照列表)
+- **用法描述**：查询指标在指定时间段的历史快照。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/history -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","startDate":"2024-05-01","endDate":"2024-05-31"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/history -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","startDate":"2024-05-01","endDate":"2024-05-31"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/history -H "Content-Type: application/json" -d '{"indicatorCode":"","startDate":"","endDate":""}'
+
+## 16. 业务指标趋势变化分析-日 `/api/indicator-monitoring/trend/day`
+- **入参**：`indicatorCode`(必填, 指标编码)、`recentDays`(必填, 最近天数1-30)
+- **出参**：`success`(布尔状态)、`records`(按天统计的趋势数据列表)、`periodType`(返回的统计周期标识)
+- **用法描述**：获取最近若干天的指标趋势与平均值。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/day -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentDays":30}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/trend/day -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentDays":30}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/day -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentDays":0}'
+
+## 17. 业务指标趋势变化分析-周 `/api/indicator-monitoring/trend/week`
+- **入参**：`indicatorCode`(必填, 指标编码)、`recentWeeks`(必填, 最近周数1-26)
+- **出参**：`success`(布尔状态)、`records`(按周统计的趋势数据列表)、`periodType`(返回的统计周期标识)
+- **用法描述**：获取指定指标的周度趋势记录。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/week -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentWeeks":12}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/trend/week -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentWeeks":12}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/week -H "Content-Type: application/json" -d '{"indicatorCode":"","recentWeeks":100}'
+
+## 18. 业务指标趋势变化分析-月 `/api/indicator-monitoring/trend/month`
+- **入参**：`indicatorCode`(必填, 指标编码)、`recentMonths`(必填, 最近月数1-36)
+- **出参**：`success`(布尔状态)、`records`(按月统计的趋势数据列表)、`periodType`(返回的统计周期标识)
+- **用法描述**：获取指标的月度趋势与均值。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/month -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentMonths":18}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/trend/month -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentMonths":18}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/month -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentMonths":100}'
+
+## 19. 业务指标与历史数据的对比-同比 `/api/indicator-monitoring/compare/yoy`
+- **入参**：`indicatorCode`(必填, 指标编码)、`currentPeriod`(必填, yyyy-MM-dd 格式当前日期)、`previousPeriod`(可选, 由系统默认取去年同日)
+- **出参**：`success`(布尔状态, 若缺少数据则为 false)、`comparison`(同比对比结果, 含当前/去年值及差异率)
+- **用法描述**：比较指定日期与去年同一天的指标表现，未传 previousPeriod 时系统自动按去年同一天计算。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/yoy -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05-02"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/compare/yoy -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05-03","previousPeriod":"2023-05-03"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/yoy -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024/05/02"}'
+
+## 20. 业务指标与历史数据的对比-环比 `/api/indicator-monitoring/compare/mom`
+- **入参**：`indicatorCode`(必填, 指标编码)、`currentPeriod`(必填, yyyy-MM-dd 格式当前日期)、`previousPeriod`(可选, 默认取前一天)
+- **出参**：`success`(布尔状态, 若缺少数据则为 false)、`comparison`(环比对比结果, 含当前/昨日值及差异率)
+- **用法描述**：对比指标在指定日期与前一天的差异，未提供 previousPeriod 时默认取前一天。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/mom -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05-02"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/compare/mom -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05-03","previousPeriod":"2024-05-02"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/mom -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05-03","previousPeriod":"2024-05-01"}'
+
+## 21. 营销业务指标实时监控分析-指标分类维度 `/api/indicator-monitoring/realtime`
+- **入参**：`category`(必填, 指标分类维度)、`includeAlerts`(可选, 是否包含告警指标)、`pageNo`(必填, 页码>0)、`pageSize`(必填, 1-200 范围的分页大小)
+- **出参**：`success`(布尔状态)、`total`(记录总数)、`summaries`(实时监控指标汇总列表)
+- **用法描述**：按分类维度获取实时监控数据，可选择是否包含告警项。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/realtime -H "Content-Type: application/json" -d '{"category":"关键业务指标","includeAlerts":false,"pageNo":1,"pageSize":20}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/indicator-monitoring/realtime -H "Content-Type: application/json" -d '{"category":"关键业务指标","includeAlerts":false,"pageNo":1,"pageSize":20}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/indicator-monitoring/realtime -H "Content-Type: application/json" -d '{"category":"","pageNo":0,"pageSize":500}'
+
+## 22. 营销标签应用情况监控分析-标签应用数量 `/api/tag-monitoring/usage-count`
+- **入参**：`tagName`(必填, 标签名称)、`startDate`(必填, 起始日期yyyy-MM-dd)、`endDate`(必填, 结束日期yyyy-MM-dd)
+- **出参**：`success`(布尔状态)、`summary`(标签在周期内的应用统计)
+- **用法描述**：按时间范围查看指定营销标签在指定周期内的应用次数汇总。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/usage-count -H "Content-Type: application/json" -d '{"tagName":"高价值用户","startDate":"2023-07-01","endDate":"2023-07-31"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/usage-count -H "Content-Type: application/json" -d '{"tagName":"高价值用户","startDate":"2023-07-01","endDate":"2023-07-31"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/usage-count -H "Content-Type: application/json" -d '{"tagName":"","startDate":"2023-08-01","endDate":"2023-07-01"}'
+
+## 23. 营销标签应用情况监控分析-标签应用使用频率 `/api/tag-monitoring/usage-frequency`
+- **入参**：`tagName`(必填, 标签名称)、`frequencyType`(必填, 统计粒度如 DAILY/WEEKLY)、`referencePeriod`(必填, 参考周期如2024-05)
+- **出参**：`success`(布尔状态)、`frequency`(标签平均使用频率信息)
+- **用法描述**：查询标签在指定周期下的平均使用频率指标，用于评估标签触发活跃度。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/usage-frequency -H "Content-Type: application/json" -d '{"tagName":"高价值用户","frequencyType":"DAILY","referencePeriod":"2023-07"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/usage-frequency -H "Content-Type: application/json" -d '{"tagName":"高价值用户","frequencyType":"DAILY","referencePeriod":"2023-07"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/usage-frequency -H "Content-Type: application/json" -d '{"tagName":"高价值用户","frequencyType":"","referencePeriod":"2023-07"}'
+
+## 24. 营销标签应用情况监控分析-标签应用影响范围 `/api/tag-monitoring/impact-scope`
+- **入参**：`tagName`(必填, 标签名称)、`scopeDimension`(必填, 影响范围维度说明)、`startDate`(可选, 起始日期)、`endDate`(可选, 结束日期)
+- **出参**：`success`(布尔状态)、`impact`(标签影响范围统计信息)
+- **用法描述**：统计标签覆盖的用户数量和关键分群，帮助评估标签影响范围。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/impact-scope -H "Content-Type: application/json" -d '{"tagName":"高价值用户","scopeDimension":"地区"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/impact-scope -H "Content-Type: application/json" -d '{"tagName":"高价值用户","scopeDimension":"地区"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/impact-scope -H "Content-Type: application/json" -d '{"tagName":"","scopeDimension":"地区"}'
+
+## 25. 实时监控标签应用情况和效果-标签应用触发情况 `/api/tag-monitoring/trigger-status`
+- **入参**：`tagName`(必填, 标签名称)、`monitoringWindow`(必填, 监控窗口描述)、`monitoredDate`(必填, yyyy-MM-dd 监控日期)
+- **出参**：`success`(布尔状态)、`triggers`(触发统计列表)
+- **用法描述**：实时查看标签触发次数与成功率，用于监控投放执行情况。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/trigger-status -H "Content-Type: application/json" -d '{"tagName":"高价值用户","monitoringWindow":"2023-07-31"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/trigger-status -H "Content-Type: application/json" -d '{"tagName":"高价值用户","monitoringWindow":"2023-07-31"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/trigger-status -H "Content-Type: application/json" -d '{"tagName":"高价值用户","monitoringWindow":""}'
+
+## 26. 实时监控标签应用情况和效果-标签应用应用效果 `/api/tag-monitoring/effectiveness`
+- **入参**：`tagName`(必填, 标签名称)、`evaluationPeriod`(必填, 评估周期描述)、`targetMetric`(可选, 关注的指标)
+- **出参**：`success`(布尔状态)、`effectiveness`(标签效果评估结果)
+- **用法描述**：评估标签带来的转化、互动效果，支持效果复盘。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/effectiveness -H "Content-Type: application/json" -d '{"tagName":"高价值用户","evaluationDate":"2023-07-31"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/effectiveness -H "Content-Type: application/json" -d '{"tagName":"高价值用户","evaluationDate":"2023-07-31"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/effectiveness -H "Content-Type: application/json" -d '{"tagName":"高价值用户","evaluationDate":"2023/07/31"}'
+
+## 27. 实时监控标签应用情况和效果-标签应用用户反馈 `/api/tag-monitoring/user-feedback`
+- **入参**：`tagName`(必填, 标签名称)、`feedbackChannel`(必填, 反馈渠道)、`collectDate`(必填, yyyy-MM-dd 收集日期)
+- **出参**：`success`(布尔状态)、`feedback`(用户反馈记录列表)
+- **用法描述**：收集业务人员对标签效果的主观反馈，及时跟踪使用体验。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/user-feedback -H "Content-Type: application/json" -d '{"tagName":"高价值用户","feedbackPeriod":"2023-07"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/tag-monitoring/user-feedback -H "Content-Type: application/json" -d '{"tagName":"高价值用户","feedbackPeriod":"2023-07"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/tag-monitoring/user-feedback -H "Content-Type: application/json" -d '{"tagName":"高价值用户","feedbackPeriod":""}'
+
+## 28. 配置脱敏加密规则 `/api/sensitive-rules/masking-rule`
+- **入参**：`ruleName`(必填, 规则名称)、`sensitiveField`(必填, 脱敏字段名)、`maskingType`(必填, 脱敏方式)、`algorithm`(必填, 加密算法)、`policyBasis`(可选, 制度依据)
+- **出参**：`success`(布尔状态)、`rules`(脱敏加密规则列表)
+- **用法描述**：新增敏感字段的脱敏与加密规则配置，保存制度依据。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/masking-rule -H "Content-Type: application/json" -d '{"dataType":"身份证号","fieldName":"id_card","maskingStrategy":"MASK_MIDDLE","encryptionAlgorithm":"SM4","policyReference":"安全制度-第12条"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/sensitive-rules/masking-rule -H "Content-Type: application/json" -d '{"dataType":"身份证号","fieldName":"id_card","maskingStrategy":"MASK_MIDDLE","encryptionAlgorithm":"SM4","policyReference":"安全制度-第12条"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/masking-rule -H "Content-Type: application/json" -d '{"dataType":"","fieldName":"id_card","maskingStrategy":"MASK_MIDDLE"}'
+
+## 29. 密钥生成 `/api/sensitive-rules/generate-key`
+- **入参**：`keyAlias`(必填, 密钥别名)、`algorithm`(必填, 算法类型)、`validDays`(必填, 有效期天数>0)
+- **出参**：`success`(布尔状态)、`key`(生成的密钥信息)
+- **用法描述**：为敏感数据生成对称密钥，记录算法与长度。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/generate-key -H "Content-Type: application/json" -d '{"keyName":"order-data-key","algorithm":"AES","keyLength":256}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/sensitive-rules/generate-key -H "Content-Type: application/json" -d '{"keyName":"order-data-key","algorithm":"AES","keyLength":256}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/generate-key -H "Content-Type: application/json" -d '{"keyName":"order-data-key","algorithm":"","keyLength":256}'
+
+## 30. 密钥存储 `/api/sensitive-rules/store-key`
+- **入参**：`keyAlias`(必填, 密钥别名)、`storageLocation`(必填, 存储位置标识)、`securityLevel`(必填, 存储安全级别)
+- **出参**：`success`(布尔状态)、`storages`(密钥存储记录列表)
+- **用法描述**：登记密钥的存储位置与保护级别，确保密钥管理流程可追溯。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/store-key -H "Content-Type: application/json" -d '{"keyId":21,"storageLocation":"HSM-Cluster-A","protectionLevel":"LEVEL-1"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/sensitive-rules/store-key -H "Content-Type: application/json" -d '{"keyId":21,"storageLocation":"HSM-Cluster-A","protectionLevel":"LEVEL-1"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/store-key -H "Content-Type: application/json" -d '{"keyId":0,"storageLocation":"HSM-Cluster-A","protectionLevel":"LEVEL-1"}'
+
+## 31. 密钥分发 `/api/sensitive-rules/distribute-key`
+- **入参**：`keyAlias`(必填, 密钥别名)、`distributionChannel`(必填, 分发渠道)、`distributionMode`(必填, 分发方式)
+- **出参**：`success`(布尔状态)、`distributions`(密钥分发记录列表)
+- **用法描述**：登记密钥分发目标系统及方式，满足密钥分发追踪要求。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/distribute-key -H "Content-Type: application/json" -d '{"keyId":21,"targetSystem":"marketing-engine","distributionMethod":"API_PUSH"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/sensitive-rules/distribute-key -H "Content-Type: application/json" -d '{"keyId":21,"targetSystem":"marketing-engine","distributionMethod":"API_PUSH"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/distribute-key -H "Content-Type: application/json" -d '{"keyId":21,"targetSystem":"","distributionMethod":"API_PUSH"}'
+
+## 32. 密钥轮换 `/api/sensitive-rules/rotate-key`
+- **入参**：`keyAlias`(必填, 密钥别名)、`rotationStrategy`(必填, 轮换策略描述)、`rotationIntervalDays`(必填, 轮换间隔天数>0)
+- **出参**：`success`(布尔状态)、`rotations`(密钥轮换记录列表)
+- **用法描述**：记录密钥轮换周期与下一次轮换日期，并返回历史轮换记录供审计。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/rotate-key -H "Content-Type: application/json" -d '{"keyId":21,"rotationPeriodDays":90,"nextRotationDate":"2023-10-01"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/sensitive-rules/rotate-key -H "Content-Type: application/json" -d '{"keyId":21,"rotationPeriodDays":90,"nextRotationDate":"2023-10-01"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/sensitive-rules/rotate-key -H "Content-Type: application/json" -d '{"keyId":21,"rotationPeriodDays":0,"nextRotationDate":"2023-10-01"}'
+
+## 33. 添加校验规则到规则库 `/api/validation-rules/add`
+- **入参**：`ruleName`(必填, 校验规则名称)、`targetField`(必填, 目标字段)、`expression`(必填, 校验表达式)、`createdBy`(必填, 创建人)
+- **出参**：`success`(布尔状态)、`rules`(最新的规则库列表)
+- **用法描述**：向数据质量规则库新增自定义规则，用于后续校验流程。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/validation-rules/add -H "Content-Type: application/json" -d '{"ruleName":"营销订单金额不能为空","ruleCategory":"完整性","ruleExpression":"amount IS NOT NULL","description":"保障订单金额字段必须有值"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/validation-rules/add -H "Content-Type: application/json" -d '{"ruleName":"营销订单金额不能为空","ruleCategory":"完整性","ruleExpression":"amount IS NOT NULL","description":"保障订单金额字段必须有值"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/validation-rules/add -H "Content-Type: application/json" -d '{"ruleName":"","ruleCategory":"完整性","ruleExpression":"amount IS NOT NULL"}'
+
+## 34. 查询校验规则 `/api/validation-rules/query`
+- **入参**：`ruleName`(可选, 按名称模糊查询)、`targetField`(可选, 按字段过滤)、`pageNo`(必填, 页码>0)、`pageSize`(必填, 1-200 范围的分页大小)
+- **出参**：`success`(布尔状态)、`total`(匹配规则数量)、`records`(规则列表)
+- **用法描述**：按规则分类与关键字组合查询数据质量规则，支持多维过滤。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/validation-rules/query -H "Content-Type: application/json" -d '{"ruleCategory":"完整性","keyword":"金额"}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/validation-rules/query -H "Content-Type: application/json" -d '{"ruleCategory":"完整性","keyword":"金额"}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/validation-rules/query -H "Content-Type: application/json" -d '{"ruleCategory":"","keyword":""}'
+
+## 35. 删除校验规则 `/api/validation-rules/delete`
+- **入参**：`ruleId`(必填, 待删除规则ID>0)
+- **出参**：`success`(布尔状态)、`deleted`(成功删除的规则数量)
+- **用法描述**：根据规则ID从数据质量规则库中删除指定规则。
+  - ✅ 示例：curl -X POST http://localhost:8080/api/validation-rules/delete -H "Content-Type: application/json" -d '{"ruleId":61}'
+  - ✅ 示例2：curl -X POST http://localhost:1080/api/validation-rules/delete -H "Content-Type: application/json" -d '{"ruleId":61}'
+  - ❌ 示例：curl -X POST http://localhost:8080/api/validation-rules/delete -H "Content-Type: application/json" -d '{"ruleId":0}'

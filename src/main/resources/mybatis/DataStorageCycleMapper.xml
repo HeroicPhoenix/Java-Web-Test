@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DataStorageCycleMapper">
+
+    <insert id="insertLifecycleRecord" parameterType="com.lvwyh.entity.DataLifecycleRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO data_lifecycle_record(dataset_name, business_process, retention_days, owner, created_at)
+        VALUES(#{datasetName}, #{businessProcess}, #{retentionDays}, #{owner}, #{createdAt})
+    </insert>
+
+    <select id="selectLifecycleRecords" resultType="com.lvwyh.entity.DataLifecycleRecord">
+        SELECT id, dataset_name AS datasetName, business_process AS businessProcess,
+               retention_days AS retentionDays, owner, created_at AS createdAt
+        FROM data_lifecycle_record
+        <where>
+            <if test="datasetName != null and datasetName != ''">
+                AND dataset_name = #{datasetName}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insertStoragePlan" parameterType="com.lvwyh.entity.StorageCyclePlan" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO storage_cycle_plan(dataset_name, strategy_type, recommended_days, notes, requested_by, created_at)
+        VALUES(#{datasetName}, #{strategyType}, #{recommendedDays}, #{notes}, #{requestedBy}, #{createdAt})
+    </insert>
+
+    <select id="selectPlansByType" resultType="com.lvwyh.entity.StorageCyclePlan">
+        SELECT id, dataset_name AS datasetName, strategy_type AS strategyType,
+               recommended_days AS recommendedDays, notes, requested_by AS requestedBy, created_at AS createdAt
+        FROM storage_cycle_plan
+        <where>
+            <if test="datasetName != null and datasetName != ''">
+                AND dataset_name = #{datasetName}
+            </if>
+            <if test="strategyType != null and strategyType != ''">
+                AND strategy_type = #{strategyType}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.SensitiveRuleConfigMapper">
+
+    <insert id="insertMaskingRule" parameterType="com.lvwyh.entity.MaskingRuleConfig" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO masking_rule_config(data_type, field_name, masking_strategy, encryption_algorithm, policy_reference, created_at)
+        VALUES(#{dataType}, #{fieldName}, #{maskingStrategy}, #{encryptionAlgorithm}, #{policyReference}, #{createdAt})
+    </insert>
+
+    <insert id="insertEncryptionKey" parameterType="com.lvwyh.entity.EncryptionKey" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO encryption_key(key_name, algorithm, key_length, generated_at)
+        VALUES(#{keyName}, #{algorithm}, #{keyLength}, #{generatedAt})
+    </insert>
+
+    <insert id="insertKeyStorage" parameterType="com.lvwyh.entity.KeyStorageRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO key_storage_record(key_id, storage_location, protection_level, stored_at)
+        VALUES(#{keyId}, #{storageLocation}, #{protectionLevel}, #{storedAt})
+    </insert>
+
+    <insert id="insertKeyDistribution" parameterType="com.lvwyh.entity.KeyDistributionRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO key_distribution_record(key_id, target_system, distribution_method, distributed_at)
+        VALUES(#{keyId}, #{targetSystem}, #{distributionMethod}, #{distributedAt})
+    </insert>
+
+    <insert id="insertKeyRotation" parameterType="com.lvwyh.entity.KeyRotationRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO key_rotation_record(key_id, rotation_period_days, next_rotation_date, updated_at)
+        VALUES(#{keyId}, #{rotationPeriodDays}, #{nextRotationDate}, #{updatedAt})
+    </insert>
+
+    <select id="selectKeyById" resultType="com.lvwyh.entity.EncryptionKey">
+        SELECT id, key_name AS keyName, algorithm, key_length AS keyLength, generated_at AS generatedAt
+        FROM encryption_key
+        WHERE id = #{keyId}
+    </select>
+
+    <select id="selectRotationByKey" resultType="com.lvwyh.entity.KeyRotationRecord">
+        SELECT id, key_id AS keyId, rotation_period_days AS rotationPeriodDays,
+               next_rotation_date AS nextRotationDate, updated_at AS updatedAt
+        FROM key_rotation_record
+        WHERE key_id = #{keyId}
+        ORDER BY updated_at DESC
+    </select>
+
+</mapper>
