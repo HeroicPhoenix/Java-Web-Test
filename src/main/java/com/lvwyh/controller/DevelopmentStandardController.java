@@ -10,6 +10,7 @@ import com.lvwyh.ao.TableStandardCheckAO;
 import com.lvwyh.service.DevelopmentStandardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,9 +26,9 @@ import java.util.Map;
 @Tag(name = "开发规范校验", description = "数据中台开发规范校验接口")
 public class DevelopmentStandardController {
 
+
     @Autowired
     private DevelopmentStandardService developmentStandardService;
-
 
     @PostMapping("/table")
     @Operation(summary = "建表规范校验")

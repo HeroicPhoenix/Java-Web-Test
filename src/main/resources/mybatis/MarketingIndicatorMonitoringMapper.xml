@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.MarketingIndicatorMonitoringMapper">
+
+    <select id="selectIndicatorSnapshots" resultType="com.lvwyh.entity.IndicatorSnapshot">
+        SELECT id, indicator_code AS indicatorCode, indicator_name AS indicatorName,
+               snapshot_date AS snapshotDate, snapshot_value AS snapshotValue, created_at AS createdAt
+        FROM indicator_snapshot
+        WHERE indicator_code = #{indicatorCode}
+          AND snapshot_date BETWEEN #{startDate} AND #{endDate}
+        ORDER BY snapshot_date ASC
+    </select>
+
+    <select id="selectTrendRecords" resultType="com.lvwyh.entity.IndicatorTrendRecord">
+        SELECT id, indicator_code AS indicatorCode, period_type AS periodType,
+               period_start AS periodStart, period_end AS periodEnd,
+               average_value AS averageValue, max_value AS maxValue, min_value AS minValue,
+               created_at AS createdAt
+        FROM indicator_trend_record
+        WHERE indicator_code = #{indicatorCode}
+          AND period_type = #{periodType}
+        ORDER BY period_start DESC
+        LIMIT #{recentCount}
+    </select>
+
+    <select id="selectLatestComparison" resultType="com.lvwyh.entity.IndicatorComparisonRecord">
+        SELECT id, indicator_code AS indicatorCode, compare_type AS compareType,
+               current_period AS currentPeriod, previous_period AS previousPeriod,
+               current_value AS currentValue, previous_value AS previousValue,
+               difference_rate AS differenceRate, created_at AS createdAt
+        FROM indicator_comparison_record
+        WHERE indicator_code = #{indicatorCode}
+          AND compare_type = #{compareType}
+          AND current_period = #{currentPeriod}
+        ORDER BY created_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectRealtimeSummary" resultType="com.lvwyh.entity.IndicatorRealtimeSummary">
+        SELECT id, indicator_category AS indicatorCategory, total_indicators AS totalIndicators,
+               active_alerts AS activeAlerts, responsible_owner AS responsibleOwner,
+               system_calls AS systemCalls, access_count AS accessCount,
+               average_response_ms AS averageResponseMs, last_updated_at AS lastUpdatedAt
+        FROM indicator_realtime_summary
+        <where>
+            <if test="category != null and category != ''">
+                AND indicator_category = #{category}
+            </if>
+            <if test="!includeAlerts">
+                AND active_alerts = 0
+            </if>
+        </where>
+        ORDER BY last_updated_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countRealtimeSummary" resultType="int">
+        SELECT COUNT(1)
+        FROM indicator_realtime_summary
+        <where>
+            <if test="category != null and category != ''">
+                AND indicator_category = #{category}
+            </if>
+            <if test="!includeAlerts">
+                AND active_alerts = 0
+            </if>
+        </where>
+    </select>
+
+</mapper>
