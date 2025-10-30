@@ -1,0 +1,334 @@
+接口名称：导出相关冗余数据清单
+URL：POST /api/data-redundancy/export
+入参：{
+  "domainName": "营销活动",
+  "outputFormat": "CSV",
+  "includeResolved": true
+}
+出参：{
+  "success": true,
+  "total": 3,
+  "exportFormat": "CSV",
+  "records": [ ... 冗余数据详情 ... ]
+}
+用法描述：根据领域名称导出冗余数据记录，可选择导出格式和是否包含已整改项。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-redundancy/export -H "Content-Type: application/json" -d '{"domainName":"营销活动","outputFormat":"CSV","includeResolved":true}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-redundancy/export -H "Content-Type: application/json" -d '{"domainName":"","outputFormat":"TXT"}'
+
+接口名称：记录数据生命周期
+URL：POST /api/data-storage-cycle/lifecycle
+入参：{
+  "datasetName": "customer_order",
+  "businessProcess": "订单履约",
+  "retentionDays": 60,
+  "owner": "li.si"
+}
+出参：{
+  "success": true,
+  "records": [ ... 历史生命周期记录 ... ]
+}
+用法描述：记录业务数据集的生命周期设定并返回当前记录列表。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-storage-cycle/lifecycle -H "Content-Type: application/json" -d '{"datasetName":"customer_order","businessProcess":"订单履约","retentionDays":60,"owner":"li.si"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-storage-cycle/lifecycle -H "Content-Type: application/json" -d '{"datasetName":"customer_order","retentionDays":0,"owner":""}'
+
+接口名称：数据存储周期规划-时效性较强的数据，适当缩短存储周期
+URL：POST /api/data-storage-cycle/plan/high-sensitivity
+入参：{
+  "datasetName": "real_time_event",
+  "recommendedDays": 14,
+  "justification": "实时事件仅需保留两周",
+  "requestedBy": "wang.wu"
+}
+出参：{
+  "success": true,
+  "plans": [ ... 高时效数据存储策略 ... ]
+}
+用法描述：为高时效数据制定短周期存储计划。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/high-sensitivity -H "Content-Type: application/json" -d '{"datasetName":"real_time_event","recommendedDays":14,"justification":"实时事件仅需保留两周","requestedBy":"wang.wu"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/high-sensitivity -H "Content-Type: application/json" -d '{"datasetName":"real_time_event","recommendedDays":120,"justification":"短期","requestedBy":""}'
+
+接口名称：数据存储周期规划-长期业务数据，考虑长期存储策略
+URL：POST /api/data-storage-cycle/plan/long-term
+入参：{
+  "datasetName": "customer_profile",
+  "minimumRetentionDays": 730,
+  "archivalStrategy": "每年归档一次并同步冷存储",
+  "reviewer": "admin"
+}
+出参：{
+  "success": true,
+  "plans": [ ... 长期存储策略 ... ]
+}
+用法描述：提交长期业务数据的存储与归档策略。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/long-term -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","minimumRetentionDays":730,"archivalStrategy":"每年归档一次并同步冷存储","reviewer":"admin"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-storage-cycle/plan/long-term -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","minimumRetentionDays":30,"archivalStrategy":"短策略","reviewer":""}'
+
+接口名称：分类管理查询语句
+URL：POST /api/slow-sql/classify
+入参：{
+  "categoryName": "缺索引查询",
+  "sampleSql": "SELECT * FROM orders WHERE customer_id = ?",
+  "optimizationSuggestion": "增加customer_id索引",
+  "expectedGain": 60
+}
+出参：{
+  "success": true,
+  "queries": [ ... 分类后的慢SQL ... ]
+}
+用法描述：登记慢SQL分类与优化建议，供运维查询。
+测试用例-正常：curl -X POST http://localhost:8080/api/slow-sql/classify -H "Content-Type: application/json" -d '{"categoryName":"缺索引查询","sampleSql":"SELECT * FROM orders WHERE customer_id = ?","optimizationSuggestion":"增加customer_id索引","expectedGain":60}'
+测试用例-异常：curl -X POST http://localhost:8080/api/slow-sql/classify -H "Content-Type: application/json" -d '{"categoryName":"","sampleSql":"select 1","expectedGain":200}'
+
+接口名称：数据库结构调整策略
+URL：POST /api/slow-sql/structure
+入参：{
+  "strategyName": "订单表分区",
+  "adjustmentDetail": "按照月份新增HASH分区，提升写入效率",
+  "expectedImpact": "减少写入锁等待",
+  "proposer": "ops"
+}
+出参：{
+  "success": true,
+  "strategies": [ ... 调整策略列表 ... ]
+}
+用法描述：登记数据库结构调整建议，持续完善优化规则库。
+测试用例-正常：curl -X POST http://localhost:8080/api/slow-sql/structure -H "Content-Type: application/json" -d '{"strategyName":"订单表分区","adjustmentDetail":"按照月份新增HASH分区，提升写入效率","expectedImpact":"减少写入锁等待","proposer":"ops"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/slow-sql/structure -H "Content-Type: application/json" -d '{"strategyName":"","adjustmentDetail":"简单调优","expectedImpact":""}'
+
+接口名称：建立数据库监控记录
+URL：POST /api/slow-sql/monitoring
+入参：{
+  "monitorDate": "2024-05-01",
+  "slowQueryCount": 23,
+  "maxResponseTime": 4500,
+  "notes": "凌晨批处理波动"
+}
+出参：{
+  "success": true,
+  "records": [ ... 监控记录 ... ]
+}
+用法描述：记录每日慢SQL监控摘要，便于排查。
+测试用例-正常：curl -X POST http://localhost:8080/api/slow-sql/monitoring -H "Content-Type: application/json" -d '{"monitorDate":"2024-05-01","slowQueryCount":23,"maxResponseTime":4500,"notes":"凌晨批处理波动"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/slow-sql/monitoring -H "Content-Type: application/json" -d '{"monitorDate":"","slowQueryCount":-1,"maxResponseTime":0}'
+
+接口名称：数据权威源目录清单
+URL：POST /api/data-source-management/authority-catalog
+入参：{
+  "domainName": "营销域",
+  "owner": "marketing_team",
+  "pageNo": 1,
+  "pageSize": 20
+}
+出参：{
+  "success": true,
+  "total": 5,
+  "entries": [ ... 权威源列表 ... ]
+}
+用法描述：分页查询指定领域的数据权威源及负责人。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-source-management/authority-catalog -H "Content-Type: application/json" -d '{"domainName":"营销域","owner":"marketing_team","pageNo":1,"pageSize":20}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-source-management/authority-catalog -H "Content-Type: application/json" -d '{"domainName":"营销域","pageNo":0,"pageSize":300}'
+
+接口名称：营销指标的数据来源追溯
+URL：POST /api/data-source-management/indicator-trace
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "indicatorName": "转化率",
+  "traceDepth": "DEEP"
+}
+出参：{
+  "success": true,
+  "lineage": [ ... 指标血缘列表 ... ]
+}
+用法描述：检索营销指标的来源表字段及血缘路径。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-source-management/indicator-trace -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","traceDepth":"DEEP"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-source-management/indicator-trace -H "Content-Type: application/json" -d '{"indicatorCode":"","indicatorName":""}'
+
+接口名称：权限管理—授权的管理员用户才能进行数据资产清单维护、数据血缘关系等功能管理和修改操作
+URL：POST /api/data-responsibility/admin-permission
+入参：{
+  "adminUserId": 1001,
+  "permissionType": "ASSET_MAINTAIN",
+  "grantedBy": "system",
+  "expireAt": "2025-12-31 23:59:59"
+}
+出参：{
+  "success": true,
+  "permissions": [ ... 最近授权记录 ... ]
+}
+用法描述：记录管理员的权限授权信息。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-responsibility/admin-permission -H "Content-Type: application/json" -d '{"adminUserId":1001,"permissionType":"ASSET_MAINTAIN","grantedBy":"system","expireAt":"2025-12-31 23:59:59"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-responsibility/admin-permission -H "Content-Type: application/json" -d '{"adminUserId":0,"permissionType":"","grantedBy":""}'
+
+接口名称：权限管理—普通用户其他可以根据业务对应关系授权是否可查、引用数据血缘相关内容
+URL：POST /api/data-responsibility/user-access
+入参：{
+  "userId": 2008,
+  "businessRelation": "渠道运营",
+  "accessScope": "READ_ONLY",
+  "approver": "admin"
+}
+出参：{
+  "success": true,
+  "accesses": [ ... 授权记录 ... ]
+}
+用法描述：登记普通用户对血缘内容的授权范围。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-responsibility/user-access -H "Content-Type: application/json" -d '{"userId":2008,"businessRelation":"渠道运营","accessScope":"READ_ONLY","approver":"admin"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-responsibility/user-access -H "Content-Type: application/json" -d '{"userId":0,"businessRelation":"","accessScope":"","approver":""}'
+
+接口名称：数据加密
+URL：POST /api/data-security/encryption
+入参：{
+  "datasetName": "customer_profile",
+  "algorithm": "AES256",
+  "keyIdentifier": "kms-key-01",
+  "enabled": true
+}
+出参：{
+  "success": true,
+  "policy": { ... 加密策略 ... }
+}
+用法描述：配置或更新数据集的加密策略。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-security/encryption -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","algorithm":"AES256","keyIdentifier":"kms-key-01","enabled":true}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-security/encryption -H "Content-Type: application/json" -d '{"datasetName":"","algorithm":"A","keyIdentifier":"k1"}'
+
+接口名称：权限控制
+URL：POST /api/data-security/permission
+入参：{
+  "roleName": "marketing-analyst",
+  "datasetName": "campaign_fact",
+  "accessLevel": "READ",
+  "reviewer": "security_lead"
+}
+出参：{
+  "success": true,
+  "policies": [ ... 角色权限 ... ]
+}
+用法描述：为角色配置数据集访问级别。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-security/permission -H "Content-Type: application/json" -d '{"roleName":"marketing-analyst","datasetName":"campaign_fact","accessLevel":"READ","reviewer":"security_lead"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-security/permission -H "Content-Type: application/json" -d '{"roleName":"","datasetName":"","accessLevel":"","reviewer":""}'
+
+接口名称：数据脱敏
+URL：POST /api/data-security/masking
+入参：{
+  "datasetName": "customer_profile",
+  "fieldName": "mobile",
+  "maskingRule": "MASK_MIDDLE",
+  "sample": "138****5678"
+}
+出参：{
+  "success": true,
+  "rules": [ ... 脱敏规则列表 ... ]
+}
+用法描述：登记或更新字段脱敏策略。
+测试用例-正常：curl -X POST http://localhost:8080/api/data-security/masking -H "Content-Type: application/json" -d '{"datasetName":"customer_profile","fieldName":"mobile","maskingRule":"MASK_MIDDLE","sample":"138****5678"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/data-security/masking -H "Content-Type: application/json" -d '{"datasetName":"","fieldName":"","maskingRule":"**"}'
+
+接口名称：查询分析指定历史时点的营销业务指标
+URL：POST /api/indicator-monitoring/history
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "startDate": "2024-05-01",
+  "endDate": "2024-05-31"
+}
+出参：{
+  "success": true,
+  "snapshots": [ ... 历史指标快照 ... ]
+}
+用法描述：查询指标在指定时间段的历史快照。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/history -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","startDate":"2024-05-01","endDate":"2024-05-31"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/history -H "Content-Type: application/json" -d '{"indicatorCode":"","startDate":"","endDate":""}'
+
+接口名称：业务指标趋势变化分析-日
+URL：POST /api/indicator-monitoring/trend/day
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "recentDays": 30
+}
+出参：{
+  "success": true,
+  "periodType": "DAY",
+  "records": [ ... 日趋势 ... ],
+  "average": 1.23
+}
+用法描述：获取最近若干天的指标趋势与平均值。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/day -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentDays":30}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/day -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentDays":0}'
+
+接口名称：业务指标趋势变化分析-周
+URL：POST /api/indicator-monitoring/trend/week
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "recentWeeks": 12
+}
+出参：{
+  "success": true,
+  "periodType": "WEEK",
+  "records": [ ... 周趋势 ... ],
+  "average": 1.45
+}
+用法描述：获取指定指标的周度趋势记录。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/week -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentWeeks":12}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/week -H "Content-Type: application/json" -d '{"indicatorCode":"","recentWeeks":100}'
+
+接口名称：业务指标趋势变化分析-月
+URL：POST /api/indicator-monitoring/trend/month
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "recentMonths": 18
+}
+出参：{
+  "success": true,
+  "periodType": "MONTH",
+  "records": [ ... 月趋势 ... ],
+  "average": 1.78
+}
+用法描述：获取指标的月度趋势与均值。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/month -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentMonths":18}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/trend/month -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","recentMonths":100}'
+
+接口名称：业务指标与历史数据的对比-同比
+URL：POST /api/indicator-monitoring/compare/yoy
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "currentPeriod": "2024-05",
+  "previousPeriod": "2023-05"
+}
+出参：{
+  "success": true,
+  "comparison": { ... 同比结果 ... }
+}
+用法描述：比较指标当前期间与去年同期的差异。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/yoy -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05","previousPeriod":"2023-05"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/yoy -H "Content-Type: application/json" -d '{"indicatorCode":"","currentPeriod":"","previousPeriod":""}'
+
+接口名称：业务指标与历史数据的对比-环比
+URL：POST /api/indicator-monitoring/compare/mom
+入参：{
+  "indicatorCode": "MKT_CONV_RATE",
+  "currentPeriod": "2024-05",
+  "previousPeriod": "2024-04"
+}
+出参：{
+  "success": true,
+  "comparison": { ... 环比结果 ... }
+}
+用法描述：对比指标环比数据差异。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/mom -H "Content-Type: application/json" -d '{"indicatorCode":"MKT_CONV_RATE","currentPeriod":"2024-05","previousPeriod":"2024-04"}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/compare/mom -H "Content-Type: application/json" -d '{"indicatorCode":"","currentPeriod":"2024-05"}'
+
+接口名称：营销业务指标实时监控分析-指标分类维度
+URL：POST /api/indicator-monitoring/realtime
+入参：{
+  "category": "关键业务指标",
+  "includeAlerts": false,
+  "pageNo": 1,
+  "pageSize": 20
+}
+出参：{
+  "success": true,
+  "total": 8,
+  "summaries": [ ... 实时监控概览 ... ]
+}
+用法描述：按分类维度获取实时监控数据，可选择是否包含告警项。
+测试用例-正常：curl -X POST http://localhost:8080/api/indicator-monitoring/realtime -H "Content-Type: application/json" -d '{"category":"关键业务指标","includeAlerts":false,"pageNo":1,"pageSize":20}'
+测试用例-异常：curl -X POST http://localhost:8080/api/indicator-monitoring/realtime -H "Content-Type: application/json" -d '{"category":"","pageNo":0,"pageSize":500}'
