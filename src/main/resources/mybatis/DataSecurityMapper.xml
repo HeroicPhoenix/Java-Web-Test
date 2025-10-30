@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DataSecurityMapper">
+
+    <select id="selectEncryptionPolicy" resultType="com.lvwyh.entity.DataEncryptionPolicy">
+        SELECT id, dataset_name AS datasetName, algorithm, key_identifier AS keyIdentifier,
+               enabled, updated_at AS updatedAt
+        FROM data_encryption_policy
+        WHERE dataset_name = #{datasetName}
+    </select>
+
+    <insert id="upsertEncryptionPolicy" parameterType="com.lvwyh.entity.DataEncryptionPolicy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO data_encryption_policy(id, dataset_name, algorithm, key_identifier, enabled, updated_at)
+        VALUES(#{id}, #{datasetName}, #{algorithm}, #{keyIdentifier}, #{enabled}, #{updatedAt})
+        ON DUPLICATE KEY UPDATE
+            algorithm = VALUES(algorithm),
+            key_identifier = VALUES(key_identifier),
+            enabled = VALUES(enabled),
+            updated_at = VALUES(updated_at)
+    </insert>
+
+    <insert id="upsertAccessControlPolicy" parameterType="com.lvwyh.entity.AccessControlPolicy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO access_control_policy(id, role_name, dataset_name, access_level, reviewer, updated_at)
+        VALUES(#{id}, #{roleName}, #{datasetName}, #{accessLevel}, #{reviewer}, #{updatedAt})
+        ON DUPLICATE KEY UPDATE
+            access_level = VALUES(access_level),
+            reviewer = VALUES(reviewer),
+            updated_at = VALUES(updated_at)
+    </insert>
+
+    <select id="selectAccessControlPolicies" resultType="com.lvwyh.entity.AccessControlPolicy">
+        SELECT id, role_name AS roleName, dataset_name AS datasetName,
+               access_level AS accessLevel, reviewer, updated_at AS updatedAt
+        FROM access_control_policy
+        <where>
+            <if test="roleName != null and roleName != ''">
+                AND role_name = #{roleName}
+            </if>
+            <if test="datasetName != null and datasetName != ''">
+                AND dataset_name = #{datasetName}
+            </if>
+        </where>
+        ORDER BY updated_at DESC
+    </select>
+
+    <insert id="upsertMaskingRule" parameterType="com.lvwyh.entity.DataMaskingRule" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO data_masking_rule(id, dataset_name, field_name, masking_rule, sample, updated_at)
+        VALUES(#{id}, #{datasetName}, #{fieldName}, #{maskingRule}, #{sample}, #{updatedAt})
+        ON DUPLICATE KEY UPDATE
+            masking_rule = VALUES(masking_rule),
+            sample = VALUES(sample),
+            updated_at = VALUES(updated_at)
+    </insert>
+
+    <select id="selectMaskingRules" resultType="com.lvwyh.entity.DataMaskingRule">
+        SELECT id, dataset_name AS datasetName, field_name AS fieldName,
+               masking_rule AS maskingRule, sample, updated_at AS updatedAt
+        FROM data_masking_rule
+        <where>
+            <if test="datasetName != null and datasetName != ''">
+                AND dataset_name = #{datasetName}
+            </if>
+        </where>
+        ORDER BY updated_at DESC
+    </select>
+
+</mapper>

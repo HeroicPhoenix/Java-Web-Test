@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.MetadataInventoryMapper">
+
+    <resultMap id="MetadataItemMap" type="com.lvwyh.entity.MetadataItem">
+        <id property="id" column="id" />
+        <result property="metadataCode" column="metadata_code" />
+        <result property="metadataName" column="metadata_name" />
+        <result property="dataSource" column="data_source" />
+        <result property="dataStructure" column="data_structure" />
+        <result property="attributes" column="attributes" />
+        <result property="relationships" column="relationships" />
+        <result property="description" column="description" />
+    </resultMap>
+
+    <select id="selectMetadataItems" resultMap="MetadataItemMap">
+        SELECT id, metadata_code, metadata_name, data_source, data_structure, attributes, relationships, description
+        FROM metadata_item
+        <where>
+            <if test="dataSource != null and dataSource != ''">
+                AND data_source = #{dataSource}
+            </if>
+        </where>
+        ORDER BY id DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countMetadataItems" resultType="int">
+        SELECT COUNT(1)
+        FROM metadata_item
+        <where>
+            <if test="dataSource != null and dataSource != ''">
+                AND data_source = #{dataSource}
+            </if>
+        </where>
+    </select>
+
+    <select id="searchMetadataItems" resultMap="MetadataItemMap">
+        SELECT id, metadata_code, metadata_name, data_source, data_structure, attributes, relationships, description
+        FROM metadata_item
+        <where>
+            <if test="dataSource != null and dataSource != ''">
+                AND data_source = #{dataSource}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (metadata_name LIKE CONCAT('%', #{keyword}, '%')
+                 OR metadata_code LIKE CONCAT('%', #{keyword}, '%')
+                 OR description LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY id DESC
+    </select>
+</mapper>

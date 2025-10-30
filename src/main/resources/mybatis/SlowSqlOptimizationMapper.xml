@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.SlowSqlOptimizationMapper">
+
+    <insert id="insertSlowQuery" parameterType="com.lvwyh.entity.SlowQueryOptimization" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO slow_query_optimization(category_name, sample_sql, optimization_suggestion, expected_gain, created_at)
+        VALUES(#{categoryName}, #{sampleSql}, #{optimizationSuggestion}, #{expectedGain}, #{createdAt})
+    </insert>
+
+    <select id="selectSlowQueries" resultType="com.lvwyh.entity.SlowQueryOptimization">
+        SELECT id, category_name AS categoryName, sample_sql AS sampleSql,
+               optimization_suggestion AS optimizationSuggestion, expected_gain AS expectedGain,
+               created_at AS createdAt
+        FROM slow_query_optimization
+        <where>
+            <if test="categoryName != null and categoryName != ''">
+                AND category_name = #{categoryName}
+            </if>
+        </where>
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insertStructureStrategy" parameterType="com.lvwyh.entity.DatabaseStructureStrategy" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO database_structure_strategy(strategy_name, adjustment_detail, expected_impact, proposer, created_at)
+        VALUES(#{strategyName}, #{adjustmentDetail}, #{expectedImpact}, #{proposer}, #{createdAt})
+    </insert>
+
+    <select id="selectStructureStrategies" resultType="com.lvwyh.entity.DatabaseStructureStrategy">
+        SELECT id, strategy_name AS strategyName, adjustment_detail AS adjustmentDetail,
+               expected_impact AS expectedImpact, proposer, created_at AS createdAt
+        FROM database_structure_strategy
+        ORDER BY created_at DESC
+    </select>
+
+    <insert id="insertMonitoringRecord" parameterType="com.lvwyh.entity.DatabaseMonitoringRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO database_monitoring_record(monitor_date, slow_query_count, max_response_time, notes, created_at)
+        VALUES(#{monitorDate}, #{slowQueryCount}, #{maxResponseTime}, #{notes}, #{createdAt})
+    </insert>
+
+    <select id="selectMonitoringRecords" resultType="com.lvwyh.entity.DatabaseMonitoringRecord">
+        SELECT id, monitor_date AS monitorDate, slow_query_count AS slowQueryCount,
+               max_response_time AS maxResponseTime, notes, created_at AS createdAt
+        FROM database_monitoring_record
+        ORDER BY monitor_date DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>
