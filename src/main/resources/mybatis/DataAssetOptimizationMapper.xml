@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DataAssetOptimizationMapper">
+
+    <resultMap id="MarketingDataAssetMap" type="com.lvwyh.entity.MarketingDataAsset">
+        <id property="id" column="id" />
+        <result property="assetName" column="asset_name" />
+        <result property="assetType" column="asset_type" />
+        <result property="owner" column="owner" />
+        <result property="importanceLevel" column="importance_level" />
+        <result property="status" column="status" />
+        <result property="storageLevel" column="storage_level" />
+        <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <select id="selectMarketingAssets" resultMap="MarketingDataAssetMap">
+        SELECT id, asset_name, asset_type, owner, importance_level, status, storage_level, created_at
+        FROM marketing_data_asset
+        <where>
+            <if test="assetType != null and assetType != ''">
+                AND asset_type = #{assetType}
+            </if>
+            <if test="importanceLevel != null and importanceLevel != ''">
+                AND importance_level = #{importanceLevel}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (asset_name LIKE CONCAT('%', #{keyword}, '%') OR owner LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+        ORDER BY created_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countMarketingAssets" resultType="int">
+        SELECT COUNT(1)
+        FROM marketing_data_asset
+        <where>
+            <if test="assetType != null and assetType != ''">
+                AND asset_type = #{assetType}
+            </if>
+            <if test="importanceLevel != null and importanceLevel != ''">
+                AND importance_level = #{importanceLevel}
+            </if>
+            <if test="keyword != null and keyword != ''">
+                AND (asset_name LIKE CONCAT('%', #{keyword}, '%') OR owner LIKE CONCAT('%', #{keyword}, '%'))
+            </if>
+        </where>
+    </select>
+
+    <update id="updateAssetStorage">
+        UPDATE marketing_data_asset
+        SET storage_level = #{storageLevel}, status = #{status}
+        WHERE id = #{assetId}
+    </update>
+
+    <insert id="insertStorageChange" parameterType="com.lvwyh.entity.AssetStorageChange" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO asset_storage_change(asset_id, storage_level, operator, change_time)
+        VALUES(#{assetId}, #{storageLevel}, #{operator}, #{changeTime})
+    </insert>
+
+    <insert id="insertBackupPlan" parameterType="com.lvwyh.entity.AssetBackupPlan" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO asset_backup_plan(asset_id, backup_strategy, schedule_time, operator, status)
+        VALUES(#{assetId}, #{backupStrategy}, #{scheduleTime}, #{operator}, #{status})
+    </insert>
+
+    <insert id="insertArchiveRecord" parameterType="com.lvwyh.entity.AssetArchiveRecord" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO asset_archive_record(asset_id, archive_reason, archive_date, operator)
+        VALUES(#{assetId}, #{archiveReason}, #{archiveDate}, #{operator})
+    </insert>
+
+    <insert id="insertDeletionRequest" parameterType="com.lvwyh.entity.AssetDeletionRequest" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO asset_deletion_request(asset_id, reason, approval_user, status, request_time)
+        VALUES(#{assetId}, #{reason}, #{approvalUser}, #{status}, #{requestTime})
+    </insert>
+</mapper>

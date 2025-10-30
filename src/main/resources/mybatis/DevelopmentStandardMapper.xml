@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DevelopmentStandardMapper">
+
+    <select id="selectByRuleCode" resultType="com.lvwyh.entity.DevelopmentStandardRule">
+        SELECT id, rule_type, rule_code, rule_name, requirement, validator_regex
+        FROM development_standard_rule
+        WHERE rule_code = #{ruleCode}
+    </select>
+</mapper>

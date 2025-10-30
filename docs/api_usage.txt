@@ -1,0 +1,164 @@
+# 营销数据治理接口说明
+
+以下列出了 23 个四级功能的接口说明。每个接口均以 `POST` 方式提供，响应体均为 `Map<String, Object>` 结构，`code=500` 表示入参非法。
+
+## 1. 营销数据资产目录 `/api/data-asset-optimization/catalog`
+- **入参**：`assetType`(可选)、`importanceLevel`(可选)、`keyword`(可选)、`pageNo`(必填, >0)、`pageSize`(必填, 1-200)
+- **出参**：`records`(资产列表)、`pageNo`、`pageSize`、`total`
+- **用法描述**：分页查询营销数据资产，支持类型、重要级别与关键字过滤。
+  - ✅ 示例：`{"assetType":"交易","pageNo":1,"pageSize":10}`
+  - ❌ 示例：`{"pageNo":0,"pageSize":10}`（pageNo 不合法）
+
+## 2. 数据存储优化 `/api/data-asset-optimization/storage`
+- **入参**：`assetId`(必填, >0)、`storageLevel`(必填)、`operator`(必填)
+- **出参**：`success`、`message`
+- **用法描述**：更新资产的存储层级并记录操作日志。
+  - ✅ 示例：`{"assetId":1,"storageLevel":"WARM","operator":"system"}`
+  - ❌ 示例：`{"assetId":1,"storageLevel":"","operator":"ops"}`（storageLevel 为空）
+
+## 3. 数据备份计划 `/api/data-asset-optimization/backup`
+- **入参**：`assetId`(必填)、`backupStrategy`(必填)、`scheduleTime`(必填, yyyy-MM-dd HH:mm:ss)、`operator`(可选)
+- **出参**：`success`、`message`
+- **用法描述**：创建数据资产的备份计划。
+  - ✅ 示例：`{"assetId":1,"backupStrategy":"日增量","scheduleTime":"2024-04-01 01:00:00","operator":"ops"}`
+  - ❌ 示例：`{"assetId":1,"backupStrategy":"","scheduleTime":"2024-04-01"}`（strategy 为空且时间格式错误）
+
+## 4. 数据归档 `/api/data-asset-optimization/archive`
+- **入参**：`assetId`(必填)、`archiveReason`(必填, >=5 字符)、`operator`(可选)
+- **出参**：`success`、`message`
+- **用法描述**：登记资产归档记录。
+  - ✅ 示例：`{"assetId":3,"archiveReason":"业务下线","operator":"manager"}`
+  - ❌ 示例：`{"assetId":3,"archiveReason":"短"}`（原因过短）
+
+## 5. 数据删除 `/api/data-asset-optimization/delete`
+- **入参**：`assetId`(必填)、`reason`(必填, >=5 字符)、`approvalUser`(必填)
+- **出参**：`success`、`message`
+- **用法描述**：提交数据删除审批请求。
+  - ✅ 示例：`{"assetId":2,"reason":"合规要求删除","approvalUser":"compliance"}`
+  - ❌ 示例：`{"assetId":2,"reason":"删","approvalUser":"compliance"}`（原因过短）
+
+## 6. 元数据清单展示 `/api/metadata-inventory/list`
+- **入参**：`dataSource`(可选)、`pageNo`(必填)、`pageSize`(必填)
+- **出参**：`records`、`pageNo`、`pageSize`、`total`
+- **用法描述**：分页浏览元数据清单。
+  - ✅ 示例：`{"dataSource":"CRM","pageNo":1,"pageSize":5}`
+  - ❌ 示例：`{"pageNo":0,"pageSize":5}`（pageNo 非法）
+
+## 7. 元数据查询 `/api/metadata-inventory/query`
+- **入参**：`keyword`(必填, >=2 字符)、`dataSource`(可选)
+- **出参**：`records`、`count`
+- **用法描述**：按关键字快速定位元数据。
+  - ✅ 示例：`{"keyword":"客户"}`
+  - ❌ 示例：`{"keyword":"客"}`（关键字长度不足）
+
+## 8. 元数据导出 `/api/metadata-inventory/export`
+- **入参**：`keyword`(可选)、`exportFormat`(必填, 例如 csv/json)
+- **出参**：`exportFormat`、`recordCount`、`records`
+- **用法描述**：导出满足条件的元数据条目。
+  - ✅ 示例：`{"keyword":"订单","exportFormat":"csv"}`
+  - ❌ 示例：`{"keyword":"订单"}`（缺少导出格式）
+
+## 9. 业务规则验证 `/api/rule-validation/business`
+- **入参**：`ruleCode`(必填)、`metricValue`(必填)
+- **出参**：`ruleName`、`pass`、`threshold`
+- **用法描述**：根据业务规则阈值校验指标。
+  - ✅ 示例：`{"ruleCode":"BR_MAX_COST","metricValue":42000}`
+  - ❌ 示例：`{"ruleCode":"","metricValue":42000}`（ruleCode 为空）
+
+## 10. 数据规则验证 `/api/rule-validation/data`
+- **入参**：`ruleCode`(必填)、`fieldValue`(必填)
+- **出参**：`ruleName`、`pass`
+- **用法描述**：利用正则规则校验字段格式。
+  - ✅ 示例：`{"ruleCode":"DR_PHONE_FORMAT","fieldValue":"13812345678"}`
+  - ❌ 示例：`{"ruleCode":"DR_PHONE_FORMAT","fieldValue":"12345"}`（格式不匹配）
+
+## 11. 建表规范校验 `/api/development-standard/table`
+- **入参**：`ruleCode`(必填)、`tableDefinition`(必填, >=20 字符)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：校验建表语句是否满足 ODS 规范。
+  - ✅ 示例：`{"ruleCode":"TAB_STD_001","tableDefinition":"CREATE TABLE ods_order(biz_date date)"}`
+  - ❌ 示例：`{"ruleCode":"TAB_STD_001","tableDefinition":"CREATE"}`（语句过短）
+
+## 12. 字段类型规范校验 `/api/development-standard/field-type`
+- **入参**：`ruleCode`(必填)、`fieldType`(必填)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：判断字段类型是否在允许范围内。
+  - ✅ 示例：`{"ruleCode":"FLD_STD_001","fieldType":"STRING"}`
+  - ❌ 示例：`{"ruleCode":"FLD_STD_001","fieldType":"varchar"}`（不匹配正则）
+
+## 13. 血缘规范校验 `/api/development-standard/lineage`
+- **入参**：`ruleCode`(必填)、`lineageDescription`(必填, 含"->")
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：检查血缘描述是否符合规范。
+  - ✅ 示例：`{"ruleCode":"LNG_STD_001","lineageDescription":"ods_order->dws_order"}`
+  - ❌ 示例：`{"ruleCode":"LNG_STD_001","lineageDescription":"ods_order"}`（缺少箭头）
+
+## 14. 编码规范校验 `/api/development-standard/coding`
+- **入参**：`ruleCode`(必填)、`codeSegment`(必填, >=10 字符)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：校验 SQL 段是否符合编码约束。
+  - ✅ 示例：`{"ruleCode":"COD_STD_001","codeSegment":"SELECT * FROM table"}`
+  - ❌ 示例：`{"ruleCode":"COD_STD_001","codeSegment":"short"}`（段落过短）
+
+## 15. 分层规范校验 `/api/development-standard/layering`
+- **入参**：`ruleCode`(必填)、`layerName`(必填)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：验证数据分层命名是否符合要求。
+  - ✅ 示例：`{"ruleCode":"LYR_STD_001","layerName":"DWS"}`
+  - ❌ 示例：`{"ruleCode":"LYR_STD_001","layerName":"ODS"}`（不符合 requirement）
+
+## 16. 调度规范校验 `/api/development-standard/scheduling`
+- **入参**：`ruleCode`(必填)、`scheduleCron`(必填)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：核验调度表达式的格式。
+  - ✅ 示例：`{"ruleCode":"SCH_STD_001","scheduleCron":"0 0 2 * *"}`
+  - ❌ 示例：`{"ruleCode":"SCH_STD_001","scheduleCron":"invalid"}`（格式错误）
+
+## 17. 集成规范校验 `/api/development-standard/integration`
+- **入参**：`ruleCode`(必填)、`interfaceName`(必填)
+- **出参**：`ruleName`、`requirement`、`pass`
+- **用法描述**：校验接口命名是否以指定前缀开头。
+  - ✅ 示例：`{"ruleCode":"INT_STD_001","interfaceName":"INTF_order_sync"}`
+  - ❌ 示例：`{"ruleCode":"INT_STD_001","interfaceName":"order_sync"}`（缺少前缀）
+
+## 18. 表模型命名规范校验 `/api/naming-standard/table`
+- **入参**：`ruleCode`(必填)、`tableName`(必填)
+- **出参**：`ruleName`、`description`、`pass`
+- **用法描述**：检验表模型名称。
+  - ✅ 示例：`{"ruleCode":"TAB_NAM_001","tableName":"md_customer_dw"}`
+  - ❌ 示例：`{"ruleCode":"TAB_NAM_001","tableName":"customer"}`（不符合正则）
+
+## 19. 节点命名规范校验 `/api/naming-standard/node`
+- **入参**：`ruleCode`(必填)、`nodeName`(必填)
+- **出参**：`ruleName`、`description`、`pass`
+- **用法描述**：校验调度节点的命名。
+  - ✅ 示例：`{"ruleCode":"NODE_NAM_001","nodeName":"daily_order_node"}`
+  - ❌ 示例：`{"ruleCode":"NODE_NAM_001","nodeName":"daily"}`（不符合命名模式）
+
+## 20. 项目空间命名规范 `/api/naming-standard/project-space`
+- **入参**：`ruleCode`(必填)、`spaceName`(必填)
+- **出参**：`ruleName`、`description`、`pass`
+- **用法描述**：核验项目空间命名是否符合规范。
+  - ✅ 示例：`{"ruleCode":"SPACE_NAM_001","spaceName":"proj_marketing"}`
+  - ❌ 示例：`{"ruleCode":"SPACE_NAM_001","spaceName":"marketing"}`（缺少前缀）
+
+## 21. 自定义命名适配 `/api/naming-adaptation/custom-rule`
+- **入参**：`ruleCode`(必填)、`originalName`(必填)
+- **出参**：`success`、`adaptedName`、`ruleName`
+- **用法描述**：按照适配规则自动生成新名称。
+  - ✅ 示例：`{"ruleCode":"ADAPT_RULE_001","originalName":"customer_profile"}`
+  - ❌ 示例：`{"ruleCode":"ADAPT_RULE_001","originalName":""}`（原始名称为空）
+
+## 22. 未来电量电费数据预测 `/api/electricity-alert/forecast`
+- **入参**：`userId`(必填, >0)、`months`(必填, 1-12)
+- **出参**：`success`、`forecastCost`、`averageUsage`、`monthsConsidered`
+- **用法描述**：根据历史数据计算未来电费的趋势值。
+  - ✅ 示例：`{"userId":1001,"months":3}`
+  - ❌ 示例：`{"userId":1001,"months":0}`（months 非法）
+
+## 23. 对电价过高用户预警 `/api/electricity-alert/warning`
+- **入参**：`userId`(必填, >0)、`forecastCost`(必填, >0)
+- **出参**：`success`、`warning`、`threshold`
+- **用法描述**：根据配置阈值判断是否触发预警。
+  - ✅ 示例：`{"userId":1001,"forecastCost":480}`
+  - ❌ 示例：`{"userId":1001,"forecastCost":0}`（成本值非正）
