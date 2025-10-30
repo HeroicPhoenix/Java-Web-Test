@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DataSourceManagementMapper">
+
+    <select id="selectAuthoritySources" resultType="com.lvwyh.entity.AuthoritySourceEntry">
+        SELECT id, domain_name AS domainName, source_system AS sourceSystem,
+               description, owner, last_verified_at AS lastVerifiedAt
+        FROM authority_source_entry
+        <where>
+            <if test="domainName != null and domainName != ''">
+                AND domain_name = #{domainName}
+            </if>
+            <if test="owner != null and owner != ''">
+                AND owner = #{owner}
+            </if>
+        </where>
+        ORDER BY last_verified_at DESC
+        LIMIT #{offset}, #{limit}
+    </select>
+
+    <select id="countAuthoritySources" resultType="int">
+        SELECT COUNT(1)
+        FROM authority_source_entry
+        <where>
+            <if test="domainName != null and domainName != ''">
+                AND domain_name = #{domainName}
+            </if>
+            <if test="owner != null and owner != ''">
+                AND owner = #{owner}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectIndicatorLineage" resultType="com.lvwyh.entity.IndicatorLineageRecord">
+        SELECT id, indicator_code AS indicatorCode, indicator_name AS indicatorName,
+               source_table AS sourceTable, source_field AS sourceField,
+               lineage_path AS lineagePath, last_updated_at AS lastUpdatedAt
+        FROM indicator_lineage_record
+        <where>
+            <if test="indicatorCode != null and indicatorCode != ''">
+                AND indicator_code = #{indicatorCode}
+            </if>
+            <if test="indicatorName != null and indicatorName != ''">
+                AND indicator_name LIKE CONCAT('%', #{indicatorName}, '%')
+            </if>
+        </where>
+        <if test="traceDepth != null and traceDepth != ''">
+            ORDER BY last_updated_at DESC
+            LIMIT CASE WHEN #{traceDepth} = 'DEEP' THEN 50 ELSE 20 END
+        </if>
+        <if test="traceDepth == null or traceDepth == ''">
+            ORDER BY last_updated_at DESC
+            LIMIT 20
+        </if>
+    </select>
+
+</mapper>
