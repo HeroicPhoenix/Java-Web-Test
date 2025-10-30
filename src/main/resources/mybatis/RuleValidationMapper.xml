@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.RuleValidationMapper">
+
+    <select id="selectBusinessRuleByCode" resultType="com.lvwyh.entity.BusinessRule">
+        SELECT id, rule_code, rule_name, rule_type, threshold_value, description
+        FROM business_rule
+        WHERE rule_code = #{ruleCode}
+    </select>
+
+    <select id="selectDataRuleByCode" resultType="com.lvwyh.entity.DataRule">
+        SELECT id, rule_code, field_name, regex_pattern, description
+        FROM data_rule
+        WHERE rule_code = #{ruleCode}
+    </select>
+</mapper>
