@@ -5,6 +5,7 @@ import com.lvwyh.ao.UserLineageAccessAO;
 import com.lvwyh.service.DataResponsibilityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +20,8 @@ import java.util.Map;
 @Tag(name = "数据责任人管理", description = "数据权限管理接口")
 public class DataResponsibilityController {
 
-    private final DataResponsibilityService dataResponsibilityService;
-
-    public DataResponsibilityController(DataResponsibilityService dataResponsibilityService) {
-        this.dataResponsibilityService = dataResponsibilityService;
-    }
+    @Autowired
+    private DataResponsibilityService dataResponsibilityService;
 
     @PostMapping("/admin-permission")
     @Operation(summary = "权限管理—授权的管理员用户才能进行数据资产清单维护、数据血缘关系等功能管理和修改操作")

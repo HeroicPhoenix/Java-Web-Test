@@ -6,6 +6,7 @@ import com.lvwyh.ao.StructureAdjustmentStrategyAO;
 import com.lvwyh.service.SlowSqlOptimizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +21,8 @@ import java.util.Map;
 @Tag(name = "慢SQL问题优化记录", description = "慢SQL分类、结构调整和监控记录接口")
 public class SlowSqlOptimizationController {
 
-    private final SlowSqlOptimizationService slowSqlOptimizationService;
-
-    public SlowSqlOptimizationController(SlowSqlOptimizationService slowSqlOptimizationService) {
-        this.slowSqlOptimizationService = slowSqlOptimizationService;
-    }
+    @Autowired
+    private SlowSqlOptimizationService slowSqlOptimizationService;
 
     @PostMapping("/classify")
     @Operation(summary = "分类管理查询语句")

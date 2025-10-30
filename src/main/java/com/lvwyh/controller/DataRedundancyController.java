@@ -4,6 +4,7 @@ import com.lvwyh.ao.RedundantDataExportAO;
 import com.lvwyh.service.DataRedundancyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +19,8 @@ import java.util.Map;
 @Tag(name = "冗余数据识别", description = "冗余数据清单导出接口")
 public class DataRedundancyController {
 
-    private final DataRedundancyService dataRedundancyService;
-
-    public DataRedundancyController(DataRedundancyService dataRedundancyService) {
-        this.dataRedundancyService = dataRedundancyService;
-    }
+    @Autowired
+    private DataRedundancyService dataRedundancyService;
 
     @PostMapping("/export")
     @Operation(summary = "导出相关冗余数据清单")

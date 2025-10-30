@@ -10,12 +10,15 @@ import com.lvwyh.ao.RealtimeMonitoringAO;
 import com.lvwyh.service.MarketingIndicatorMonitoringService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,11 +27,8 @@ import java.util.Map;
 @Tag(name = "营销指标运营监控", description = "指标历史、趋势、对比及实时监控接口")
 public class MarketingIndicatorMonitoringController {
 
-    private final MarketingIndicatorMonitoringService marketingIndicatorMonitoringService;
-
-    public MarketingIndicatorMonitoringController(MarketingIndicatorMonitoringService marketingIndicatorMonitoringService) {
-        this.marketingIndicatorMonitoringService = marketingIndicatorMonitoringService;
-    }
+    @Autowired
+    private MarketingIndicatorMonitoringService marketingIndicatorMonitoringService;
 
     @PostMapping("/history")
     @Operation(summary = "查询分析指定历史时点的营销业务指标")
@@ -92,10 +92,19 @@ public class MarketingIndicatorMonitoringController {
         if (request == null || request.getIndicatorCode() == null || request.getIndicatorCode().trim().length() == 0) {
             return buildError(response, "指标编码不能为空");
         }
-        if (request.getCurrentPeriod() == null || request.getCurrentPeriod().trim().length() == 0
-                || request.getPreviousPeriod() == null || request.getPreviousPeriod().trim().length() == 0) {
-            return buildError(response, "请提供对比区间");
+        LocalDate currentDate = parseDate(request.getCurrentPeriod());
+        if (currentDate == null) {
+            return buildError(response, "当前日期格式需为yyyy-MM-dd");
         }
+        LocalDate expectedPrevious = currentDate.minusYears(1);
+        if (request.getPreviousPeriod() != null && request.getPreviousPeriod().trim().length() > 0) {
+            LocalDate provided = parseDate(request.getPreviousPeriod());
+            if (provided == null || !provided.equals(expectedPrevious)) {
+                return buildError(response, "同比日期必须为当前日期的去年同一天");
+            }
+        }
+        request.setCurrentPeriod(currentDate.toString());
+        request.setPreviousPeriod(expectedPrevious.toString());
         return marketingIndicatorMonitoringService.compareYearOverYear(request);
     }
 
@@ -106,10 +115,19 @@ public class MarketingIndicatorMonitoringController {
         if (request == null || request.getIndicatorCode() == null || request.getIndicatorCode().trim().length() == 0) {
             return buildError(response, "指标编码不能为空");
         }
-        if (request.getCurrentPeriod() == null || request.getCurrentPeriod().trim().length() == 0
-                || request.getPreviousPeriod() == null || request.getPreviousPeriod().trim().length() == 0) {
-            return buildError(response, "请提供对比区间");
+        LocalDate currentDate = parseDate(request.getCurrentPeriod());
+        if (currentDate == null) {
+            return buildError(response, "当前日期格式需为yyyy-MM-dd");
         }
+        LocalDate expectedPrevious = currentDate.minusDays(1);
+        if (request.getPreviousPeriod() != null && request.getPreviousPeriod().trim().length() > 0) {
+            LocalDate provided = parseDate(request.getPreviousPeriod());
+            if (provided == null || !provided.equals(expectedPrevious)) {
+                return buildError(response, "环比日期必须为当前日期的前一天");
+            }
+        }
+        request.setCurrentPeriod(currentDate.toString());
+        request.setPreviousPeriod(expectedPrevious.toString());
         return marketingIndicatorMonitoringService.compareMonthOverMonth(request);
     }
 
@@ -135,5 +153,20 @@ public class MarketingIndicatorMonitoringController {
         result.put("code", HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         result.put("message", message);
         return result;
+    }
+
+    private LocalDate parseDate(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        if (trimmed.length() == 0) {
+            return null;
+        }
+        try {
+            return LocalDate.parse(trimmed);
+        } catch (DateTimeParseException ex) {
+            return null;
+        }
     }
 }

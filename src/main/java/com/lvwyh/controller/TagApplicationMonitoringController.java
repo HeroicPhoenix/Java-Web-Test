@@ -24,12 +24,8 @@ import java.util.Map;
 @Tag(name = "标签应用运营监控", description = "营销标签应用监控接口")
 public class TagApplicationMonitoringController {
 
-    private final TagApplicationMonitoringService tagApplicationMonitoringService;
-
     @Autowired
-    public TagApplicationMonitoringController(TagApplicationMonitoringService tagApplicationMonitoringService) {
-        this.tagApplicationMonitoringService = tagApplicationMonitoringService;
-    }
+    private TagApplicationMonitoringService tagApplicationMonitoringService;
 
     @PostMapping("/usage-count")
     @Operation(summary = "营销标签应用情况监控分析-标签应用数量")

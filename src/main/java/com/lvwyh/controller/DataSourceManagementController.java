@@ -5,6 +5,7 @@ import com.lvwyh.ao.IndicatorTraceRequestAO;
 import com.lvwyh.service.DataSourceManagementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +20,8 @@ import java.util.Map;
 @Tag(name = "数据定源管理", description = "数据权威源目录及指标溯源接口")
 public class DataSourceManagementController {
 
-    private final DataSourceManagementService dataSourceManagementService;
-
-    public DataSourceManagementController(DataSourceManagementService dataSourceManagementService) {
-        this.dataSourceManagementService = dataSourceManagementService;
-    }
+    @Autowired
+    private DataSourceManagementService dataSourceManagementService;
 
     @PostMapping("/authority-catalog")
     @Operation(summary = "数据权威源目录清单")

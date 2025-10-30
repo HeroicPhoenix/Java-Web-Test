@@ -6,6 +6,7 @@ import com.lvwyh.ao.LongTermStoragePlanAO;
 import com.lvwyh.service.DataStorageCycleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +21,8 @@ import java.util.Map;
 @Tag(name = "数据存储周期记录", description = "数据生命周期记录与存储策略接口")
 public class DataStorageCycleController {
 
-    private final DataStorageCycleService dataStorageCycleService;
-
-    public DataStorageCycleController(DataStorageCycleService dataStorageCycleService) {
-        this.dataStorageCycleService = dataStorageCycleService;
-    }
+    @Autowired
+    private DataStorageCycleService dataStorageCycleService;
 
     @PostMapping("/lifecycle")
     @Operation(summary = "记录数据生命周期")

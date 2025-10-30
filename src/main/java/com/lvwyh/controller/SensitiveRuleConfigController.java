@@ -23,12 +23,8 @@ import java.util.Map;
 @Tag(name = "敏感数据脱敏加密规则配置维护", description = "脱敏加密规则维护接口")
 public class SensitiveRuleConfigController {
 
-    private final SensitiveRuleConfigService sensitiveRuleConfigService;
-
     @Autowired
-    public SensitiveRuleConfigController(SensitiveRuleConfigService sensitiveRuleConfigService) {
-        this.sensitiveRuleConfigService = sensitiveRuleConfigService;
-    }
+    private SensitiveRuleConfigService sensitiveRuleConfigService;
 
     @PostMapping("/masking-rule")
     @Operation(summary = "配置脱敏加密规则")

@@ -6,6 +6,7 @@ import com.lvwyh.ao.PermissionControlAO;
 import com.lvwyh.service.DataSecurityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +21,8 @@ import java.util.Map;
 @Tag(name = "建立数据主人制应用", description = "数据加密、权限控制与脱敏接口")
 public class DataSecurityController {
 
-    private final DataSecurityService dataSecurityService;
-
-    public DataSecurityController(DataSecurityService dataSecurityService) {
-        this.dataSecurityService = dataSecurityService;
-    }
+    @Autowired
+    private DataSecurityService dataSecurityService;
 
     @PostMapping("/encryption")
     @Operation(summary = "数据加密")

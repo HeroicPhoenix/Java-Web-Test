@@ -15,6 +15,8 @@ import com.lvwyh.mapper.MarketingIndicatorMonitoringMapper;
 import com.lvwyh.service.MarketingIndicatorMonitoringService;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,9 +69,30 @@ public class MarketingIndicatorMonitoringServiceImpl implements MarketingIndicat
 
     @Override
     public Map<String, Object> compareYearOverYear(IndicatorComparisonYoYAO request) {
-        IndicatorComparisonRecord record = marketingIndicatorMonitoringMapper.selectLatestComparison(
-                request.getIndicatorCode(), "YOY", request.getCurrentPeriod());
         Map<String, Object> result = new HashMap<String, Object>();
+        LocalDate currentDate = LocalDate.parse(request.getCurrentPeriod());
+        LocalDate previousDate = LocalDate.parse(request.getPreviousPeriod());
+        Double currentValue = fetchSnapshotValue(request.getIndicatorCode(), currentDate);
+        Double previousValue = fetchSnapshotValue(request.getIndicatorCode(), previousDate);
+        if (currentValue == null || previousValue == null) {
+            result.put("success", Boolean.FALSE);
+            result.put("message", "未找到指定日期的指标快照数据");
+            return result;
+        }
+        IndicatorComparisonRecord record = new IndicatorComparisonRecord();
+        record.setIndicatorCode(request.getIndicatorCode());
+        record.setCompareType("YOY");
+        record.setCurrentPeriod(currentDate.toString());
+        record.setPreviousPeriod(previousDate.toString());
+        record.setCurrentValue(currentValue);
+        record.setPreviousValue(previousValue);
+        if (previousValue.doubleValue() != 0) {
+            double rate = (currentValue.doubleValue() - previousValue.doubleValue()) / previousValue.doubleValue();
+            record.setDifferenceRate(rate);
+        } else {
+            record.setDifferenceRate(null);
+        }
+        record.setCreatedAt(new Date());
         result.put("success", Boolean.TRUE);
         result.put("comparison", record);
         return result;
@@ -77,9 +100,30 @@ public class MarketingIndicatorMonitoringServiceImpl implements MarketingIndicat
 
     @Override
     public Map<String, Object> compareMonthOverMonth(IndicatorComparisonMoMAO request) {
-        IndicatorComparisonRecord record = marketingIndicatorMonitoringMapper.selectLatestComparison(
-                request.getIndicatorCode(), "MOM", request.getCurrentPeriod());
         Map<String, Object> result = new HashMap<String, Object>();
+        LocalDate currentDate = LocalDate.parse(request.getCurrentPeriod());
+        LocalDate previousDate = LocalDate.parse(request.getPreviousPeriod());
+        Double currentValue = fetchSnapshotValue(request.getIndicatorCode(), currentDate);
+        Double previousValue = fetchSnapshotValue(request.getIndicatorCode(), previousDate);
+        if (currentValue == null || previousValue == null) {
+            result.put("success", Boolean.FALSE);
+            result.put("message", "未找到指定日期的指标快照数据");
+            return result;
+        }
+        IndicatorComparisonRecord record = new IndicatorComparisonRecord();
+        record.setIndicatorCode(request.getIndicatorCode());
+        record.setCompareType("MOM");
+        record.setCurrentPeriod(currentDate.toString());
+        record.setPreviousPeriod(previousDate.toString());
+        record.setCurrentValue(currentValue);
+        record.setPreviousValue(previousValue);
+        if (previousValue.doubleValue() != 0) {
+            double rate = (currentValue.doubleValue() - previousValue.doubleValue()) / previousValue.doubleValue();
+            record.setDifferenceRate(rate);
+        } else {
+            record.setDifferenceRate(null);
+        }
+        record.setCreatedAt(new Date());
         result.put("success", Boolean.TRUE);
         result.put("comparison", record);
         return result;
@@ -116,5 +160,15 @@ public class MarketingIndicatorMonitoringServiceImpl implements MarketingIndicat
         }
         result.put("average", Math.round(average * 100.0) / 100.0);
         return result;
+    }
+
+    private Double fetchSnapshotValue(String indicatorCode, LocalDate date) {
+        List<IndicatorSnapshot> snapshots = marketingIndicatorMonitoringMapper.selectIndicatorSnapshots(
+                indicatorCode, date.toString(), date.toString());
+        if (snapshots == null || snapshots.isEmpty()) {
+            return null;
+        }
+        IndicatorSnapshot snapshot = snapshots.get(snapshots.size() - 1);
+        return snapshot.getSnapshotValue();
     }
 }

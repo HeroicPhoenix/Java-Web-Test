@@ -21,12 +21,8 @@ import java.util.Map;
 @Tag(name = "数据校验规则库", description = "数据质量校验规则接口")
 public class ValidationRuleLibraryController {
 
-    private final ValidationRuleLibraryService validationRuleLibraryService;
-
     @Autowired
-    public ValidationRuleLibraryController(ValidationRuleLibraryService validationRuleLibraryService) {
-        this.validationRuleLibraryService = validationRuleLibraryService;
-    }
+    private ValidationRuleLibraryService validationRuleLibraryService;
 
     @PostMapping("/add")
     @Operation(summary = "添加校验规则到规则库")
