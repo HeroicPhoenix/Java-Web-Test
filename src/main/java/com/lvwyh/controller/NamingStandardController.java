@@ -6,6 +6,9 @@ import com.lvwyh.ao.TableNamingCheckAO;
 import com.lvwyh.service.NamingStandardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,11 +23,9 @@ import java.util.Map;
 @Tag(name = "命名规范校验", description = "命名规范校验接口")
 public class NamingStandardController {
 
-    private final NamingStandardService namingStandardService;
 
-    public NamingStandardController(NamingStandardService namingStandardService) {
-        this.namingStandardService = namingStandardService;
-    }
+    @Autowired
+    private NamingStandardService namingStandardService;
 
     @PostMapping("/table")
     @Operation(summary = "表模型命名规范校验")
