@@ -36,10 +36,10 @@ pagehelper:
 
 springdoc:
   api-docs:
-    enabled: true          # 默认就是 true
-    path: /v3/api-docs     # OpenAPI JSON 地址
+    enabled: true
+    path: /v3/api-docs
   swagger-ui:
-    enabled: true          # 默认就是 true
-    path: /swagger-ui.html # 访问入口（也可用 /swagger-ui/index.html）
+    enabled: true
+    path: /swagger-ui.html
     tags-sorter: alpha
     operations-sorter: method

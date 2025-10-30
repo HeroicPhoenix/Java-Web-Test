@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.TagApplicationMonitoringMapper">
+
+    <select id="selectUsageSummary" resultType="com.lvwyh.entity.TagUsageSummary">
+        SELECT id,
+               tag_name AS tagName,
+               application_count AS applicationCount,
+               period_start AS periodStart,
+               period_end AS periodEnd
+        FROM tag_usage_summary
+        WHERE tag_name = #{tagName}
+        <if test="startDate != null and startDate != ''">
+            AND period_start &gt;= #{startDate}
+        </if>
+        <if test="endDate != null and endDate != ''">
+            AND period_end &lt;= #{endDate}
+        </if>
+        ORDER BY period_end DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectFrequencyRecord" resultType="com.lvwyh.entity.TagUsageFrequencyRecord">
+        SELECT id,
+               tag_name AS tagName,
+               frequency_type AS frequencyType,
+               average_frequency AS averageFrequency,
+               calculated_at AS calculatedAt
+        FROM tag_usage_frequency_record
+        WHERE tag_name = #{tagName}
+        <if test="frequencyType != null and frequencyType != ''">
+            AND frequency_type = #{frequencyType}
+        </if>
+        <if test="referencePeriod != null and referencePeriod != ''">
+            AND reference_period = #{referencePeriod}
+        </if>
+        ORDER BY calculated_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectImpactRange" resultType="com.lvwyh.entity.TagImpactRangeRecord">
+        SELECT id,
+               tag_name AS tagName,
+               impacted_users AS impactedUsers,
+               impacted_segments AS impactedSegments,
+               updated_at AS updatedAt
+        FROM tag_impact_range_record
+        WHERE tag_name = #{tagName}
+        <if test="scopeDimension != null and scopeDimension != ''">
+            AND scope_dimension = #{scopeDimension}
+        </if>
+        ORDER BY updated_at DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectTriggerLog" resultType="com.lvwyh.entity.TagTriggerLog">
+        SELECT id,
+               tag_name AS tagName,
+               trigger_count AS triggerCount,
+               success_rate AS successRate,
+               monitored_date AS monitoredDate
+        FROM tag_trigger_log
+        WHERE tag_name = #{tagName}
+        <if test="monitoringWindow != null and monitoringWindow != ''">
+            AND monitoring_window = #{monitoringWindow}
+        </if>
+        ORDER BY monitored_date DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectEffectiveness" resultType="com.lvwyh.entity.TagEffectivenessRecord">
+        SELECT id,
+               tag_name AS tagName,
+               conversion_rate AS conversionRate,
+               engagement_score AS engagementScore,
+               evaluation_date AS evaluationDate
+        FROM tag_effectiveness_record
+        WHERE tag_name = #{tagName}
+        <if test="evaluationDate != null and evaluationDate != ''">
+            AND evaluation_date = #{evaluationDate}
+        </if>
+        ORDER BY evaluation_date DESC
+        LIMIT 1
+    </select>
+
+    <select id="selectFeedback" resultType="com.lvwyh.entity.TagFeedbackRecord">
+        SELECT id,
+               tag_name AS tagName,
+               feedback_score AS feedbackScore,
+               positive_feedback AS positiveFeedback,
+               negative_feedback AS negativeFeedback,
+               collected_at AS collectedAt
+        FROM tag_feedback_record
+        WHERE tag_name = #{tagName}
+        <if test="feedbackPeriod != null and feedbackPeriod != ''">
+            AND feedback_period = #{feedbackPeriod}
+        </if>
+        ORDER BY collected_at DESC
+    </select>
+
+</mapper>

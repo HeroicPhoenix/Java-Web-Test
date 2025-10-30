@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.DataResponsibilityMapper">
+
+    <insert id="insertAdminPermission" parameterType="com.lvwyh.entity.AdminPermission" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO admin_permission(admin_user_id, permission_type, granted_by, granted_at, expire_at)
+        VALUES(#{adminUserId}, #{permissionType}, #{grantedBy}, #{grantedAt}, #{expireAt})
+    </insert>
+
+    <select id="selectLatestAdminPermissions" resultType="com.lvwyh.entity.AdminPermission">
+        SELECT id, admin_user_id AS adminUserId, permission_type AS permissionType,
+               granted_by AS grantedBy, granted_at AS grantedAt, expire_at AS expireAt
+        FROM admin_permission
+        ORDER BY granted_at DESC
+        LIMIT #{limit}
+    </select>
+
+    <insert id="insertUserLineageAccess" parameterType="com.lvwyh.entity.UserLineageAccess" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_lineage_access(user_id, business_relation, access_scope, approver, authorized_at)
+        VALUES(#{userId}, #{businessRelation}, #{accessScope}, #{approver}, #{authorizedAt})
+    </insert>
+
+    <select id="selectUserAccessByRelation" resultType="com.lvwyh.entity.UserLineageAccess">
+        SELECT id, user_id AS userId, business_relation AS businessRelation,
+               access_scope AS accessScope, approver, authorized_at AS authorizedAt
+        FROM user_lineage_access
+        <where>
+            <if test="businessRelation != null and businessRelation != ''">
+                AND business_relation = #{businessRelation}
+            </if>
+        </where>
+        ORDER BY authorized_at DESC
+    </select>
+
+</mapper>

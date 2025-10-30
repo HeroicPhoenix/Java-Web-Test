@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lvwyh.mapper.ElectricityAlertMapper">
+
+    <resultMap id="ElectricityUsageRecordMap" type="com.lvwyh.entity.ElectricityUsageRecord">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id" />
+        <result property="monthTag" column="month_tag" />
+        <result property="usageKwh" column="usage_kwh" />
+        <result property="costAmount" column="cost_amount" />
+        <result property="recordTime" column="record_time" />
+    </resultMap>
+
+    <select id="selectUsageByUser" resultMap="ElectricityUsageRecordMap">
+        SELECT id, user_id, month_tag, usage_kwh, cost_amount, record_time
+        FROM electricity_usage_record
+        WHERE user_id = #{userId}
+        ORDER BY record_time ASC
+        LIMIT #{months}
+    </select>
+
+    <select id="selectWarningConfig" resultType="com.lvwyh.entity.HighPriceWarningConfig">
+        SELECT id, cost_threshold, usage_threshold, strategy_description
+        FROM high_price_warning_config
+        ORDER BY id DESC
+        LIMIT 1
+    </select>
+</mapper>
