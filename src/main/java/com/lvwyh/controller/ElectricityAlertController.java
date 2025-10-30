@@ -5,6 +5,7 @@ import com.lvwyh.ao.HighPriceWarningAO;
 import com.lvwyh.service.ElectricityAlertService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,11 +20,8 @@ import java.util.Map;
 @Tag(name = "电价预警", description = "电量电费预测与高价用户预警接口")
 public class ElectricityAlertController {
 
-    private final ElectricityAlertService electricityAlertService;
-
-    public ElectricityAlertController(ElectricityAlertService electricityAlertService) {
-        this.electricityAlertService = electricityAlertService;
-    }
+    @Autowired
+    private ElectricityAlertService electricityAlertService;
 
     @PostMapping("/forecast")
     @Operation(summary = "未来电量电费数据预测")

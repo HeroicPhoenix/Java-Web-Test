@@ -4,6 +4,7 @@ import com.lvwyh.ao.NamingAdaptationAO;
 import com.lvwyh.service.NamingAdaptationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,11 +19,8 @@ import java.util.Map;
 @Tag(name = "命名适配", description = "自定义命名适配接口")
 public class NamingAdaptationController {
 
-    private final NamingAdaptationService namingAdaptationService;
-
-    public NamingAdaptationController(NamingAdaptationService namingAdaptationService) {
-        this.namingAdaptationService = namingAdaptationService;
-    }
+    @Autowired
+    private NamingAdaptationService namingAdaptationService;
 
     @PostMapping("/custom-rule")
     @Operation(summary = "自定义命名适配规则")
