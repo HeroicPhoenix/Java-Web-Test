@@ -1,10 +1,12 @@
 package com.lvwyh.mapper;
 
 import com.lvwyh.entity.ValidationRuleEntry;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface ValidationRuleLibraryMapper {
     int insertRule(ValidationRuleEntry entry);
 

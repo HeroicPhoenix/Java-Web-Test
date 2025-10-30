@@ -6,10 +6,12 @@ import com.lvwyh.entity.TagImpactRangeRecord;
 import com.lvwyh.entity.TagTriggerLog;
 import com.lvwyh.entity.TagUsageFrequencyRecord;
 import com.lvwyh.entity.TagUsageSummary;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
+@Mapper
 public interface TagApplicationMonitoringMapper {
     TagUsageSummary selectUsageSummary(@Param("tagName") String tagName,
                                        @Param("startDate") String startDate,
