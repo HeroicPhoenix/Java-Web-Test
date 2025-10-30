@@ -22,10 +22,8 @@ import java.util.Map;
 @Tag(name = "规则验证", description = "业务规则验证与数据规则验证接口")
 public class RuleValidationController {
 
-
     @Autowired
     private RuleValidationService ruleValidationService;
-
 
     @PostMapping("/business")
     @Operation(summary = "业务规则验证")
